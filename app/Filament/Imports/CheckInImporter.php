@@ -23,7 +23,7 @@ class CheckInImporter extends Importer
             ImportColumn::make('checkin_comment')
                 ->label('Comment')->rules(['required']),
             ImportColumn::make('events_attended')
-                ->label('Days attended'),
+                ->label('Days attended')->helperText('Day numbers separated by comma. e.g. 1,2,3'),
         ];
     }
 

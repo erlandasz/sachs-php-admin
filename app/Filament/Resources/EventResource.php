@@ -20,6 +20,8 @@ class EventResource extends Resource
 {
     protected static ?string $model = Event::class;
 
+    protected static ?string $navigationGroup = 'Event';
+
     protected static ?string $navigationIcon = 'heroicon-o-calendar-days';
 
     public static function form(Form $form): Form
@@ -214,6 +216,7 @@ class EventResource extends Resource
         return [
             \App\Filament\Resources\EventResource\RelationManagers\PresentersRelationManager::class,
             \App\Filament\Resources\EventResource\RelationManagers\SponsorsRelationManager::class,
+            \App\Filament\Resources\EventResource\RelationManagers\PanelsRelationManager::class,
         ];
     }
 

@@ -2,15 +2,15 @@
 
 namespace App\Filament\Resources\CheckInResource\Pages;
 
+use App\Filament\Imports\CheckInImporter;
 use App\Filament\Resources\CheckInResource;
 use Filament\Actions;
 use Filament\Actions\Action;
+use Filament\Actions\ImportAction;
 use Filament\Forms\Components\Select;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Support\Collection;
 use Rawilk\Printing\Facades\Printing as PPPP;
-use App\Filament\Imports\CheckInImporter;
-use Filament\Actions\ImportAction;
 
 class ListCheckIns extends ListRecords
 {
@@ -26,6 +26,14 @@ class ListCheckIns extends ListRecords
             Actions\CreateAction::make(),
             ImportAction::make()
                 ->importer(CheckInImporter::class),
+            Action::make('deleteCheckinsAbove520')
+                ->label('Delete CheckIns')
+                ->action(function () {
+                    \App\Models\CheckIn::where('id', '>', 520)->delete();
+                })
+                ->requiresConfirmation()
+                ->color('danger')
+                ->icon('heroicon-o-trash'),
             Action::make('selectPrinter')
                 ->label(function () {
                     return $this->selectedPrinterName ?? 'Select Printer';

@@ -18,6 +18,8 @@ class PanelResource extends Resource
 {
     protected static ?string $model = Panel::class;
 
+    protected static ?string $navigationGroup = 'Event';
+
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function form(Form $form): Form

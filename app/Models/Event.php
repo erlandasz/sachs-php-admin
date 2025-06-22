@@ -2,14 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Event extends Model
 {
-    use HasFactory;
-
     /**
      * The database connection that should be used by the model.
      *
@@ -129,5 +126,10 @@ class Event extends Model
         return $this->belongsToMany(Company::class, 'event_sponsors')
             ->using(EventSponsor::class)
             ->withPivot('sponsor_type_id');
+    }
+
+    public function panels()
+    {
+        return $this->hasMany(Panel::class);
     }
 }

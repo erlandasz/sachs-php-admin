@@ -8,15 +8,18 @@ use App\Models\PayingCustomer;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Actions\ImportAction;
+use Filament\Actions\ImportAction;
 use Filament\Tables\Table;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Actions\EditAction; // <-- Add this import
 
 class PayingCustomerResource extends Resource
 {
     protected static ?string $model = PayingCustomer::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+
+    protected static ?string $navigationGroup = 'On-Site Tools';
 
     public static function form(Form $form): Form
     {
@@ -38,25 +41,25 @@ class PayingCustomerResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('user_email')
+                TextColumn::make('user_email')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('role.name')
+                TextColumn::make('role.name')
                     ->label('Role'),
             ])
             ->filters([
                 //
             ])
             ->defaultSort('id', 'desc')
-            ->headerActions([
-                ImportAction::make()->importer(PayingCustomerImporter::class),
-            ])
+                // ->headerActions([
+                //     ImportAction::make()->importer(PayingCustomerImporter::class),
+                // ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                // EditAction::make(), // <-- Now this will work
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                // Tables\Actions\BulkActionGroup::make([
+                //     Tables\Actions\DeleteBulkAction::make(),
+                // ]),
             ]);
     }
 

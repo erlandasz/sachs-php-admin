@@ -14,6 +14,8 @@ class PresenterTypeResource extends Resource
 {
     protected static ?string $model = PresenterType::class;
 
+    protected static ?string $navigationGroup = 'Utils';
+
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function form(Form $form): Form

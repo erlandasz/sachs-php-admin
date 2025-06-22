@@ -18,6 +18,8 @@ class PortalUserResource extends Resource
 
     protected static ?string $navigationLabel = 'Portal Users';
 
+    protected static ?string $navigationGroup = 'Utils';
+
     public static function form(Form $form): Form
     {
         return $form
