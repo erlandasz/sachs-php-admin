@@ -5,10 +5,15 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\EventResource\Pages;
 use App\Models\Event;
 use Filament\Forms;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 
 class EventResource extends Resource
@@ -45,8 +50,13 @@ class EventResource extends Resource
                                     ->searchable(),
                                 Forms\Components\TextInput::make('location')
                                     ->maxLength(255),
-                                Forms\Components\TextInput::make('country')
-                                    ->maxLength(255),
+                                Select::make('country')
+                                    ->options([
+                                        'CH' => 'Switzerland',
+                                        'USA' => 'United States',
+                                        'DE' => 'Germany',
+                                    ])
+                                    ->required(),
                             ]),
                         Forms\Components\Section::make('Content')
                             ->schema([
@@ -151,8 +161,15 @@ class EventResource extends Resource
                     ->sortable(),
                 Tables\Columns\IconColumn::make('show_event')
                     ->boolean(),
-                Tables\Columns\IconColumn::make('after_event')
-                    ->boolean(),
+                TextColumn::make('slug')
+                    ->label('Event Link')
+                    ->html()
+                    ->getStateUsing(fn ($record) => '<a href="https://sachsevent.com/event/'.$record->slug.'/about"
+                                      target="_blank"
+                                      rel="noopener noreferrer">
+                                        View Event
+                                    </a>'
+                    ),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -162,8 +179,19 @@ class EventResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->defaultSort('created_at', 'desc')
             ->filters([
-                //
+                Filter::make('show_event')
+                    ->query(fn (Builder $query) => $query->where('show_event', true))
+                    ->label('Only Shown Events'),
+                SelectFilter::make('country')
+                    ->options([
+                        'DE' => 'Germany',
+                        'USA' => 'United States',
+                        'CH' => 'Switzerland',
+                    ])
+                    ->multiple()
+                    ->label('Country'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
