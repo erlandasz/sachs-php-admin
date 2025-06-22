@@ -9,6 +9,8 @@ use Filament\Forms\Components\Select;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Support\Collection;
 use Rawilk\Printing\Facades\Printing as PPPP;
+use App\Filament\Imports\CheckInImporter;
+use Filament\Actions\ImportAction;
 
 class ListCheckIns extends ListRecords
 {
@@ -22,6 +24,8 @@ class ListCheckIns extends ListRecords
     {
         return [
             Actions\CreateAction::make(),
+            ImportAction::make()
+                ->importer(CheckInImporter::class),
             Action::make('selectPrinter')
                 ->label(function () {
                     return $this->selectedPrinterName ?? 'Select Printer';

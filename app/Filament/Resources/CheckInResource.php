@@ -4,8 +4,10 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CheckInResource\Pages;
 use App\Models\CheckIn;
+use App\Services\PrintingService;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
@@ -13,8 +15,6 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use App\Services\PrintingService;
-use Filament\Notifications\Notification;
 
 class CheckInResource extends Resource
 {
@@ -91,13 +91,14 @@ class CheckInResource extends Resource
                         $printerId = $livewire->selectedPrinterId ?? 'No printer selected';
 
                         if ($printerId === 'No printer selected') {
-                                    Notification::make()
-                                        ->title('No printer selected')
-                                        ->danger()
-                                        ->body('Please select a printer before printing.')
-                                        ->send();
-                                    return;
-                                }
+                            Notification::make()
+                                ->title('No printer selected')
+                                ->danger()
+                                ->body('Please select a printer before printing.')
+                                ->send();
+
+                            return;
+                        }
 
                         $printingService = app(PrintingService::class);
                         $printingService->checkIn($checkInId, $printerId);
