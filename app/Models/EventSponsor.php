@@ -9,6 +9,8 @@ class EventSponsor extends Pivot
 {
     protected $connection = 'mysql_hostinger';
 
+    protected $table = 'event_sponsors';
+
     protected $fillable = ['event_id', 'company_id', 'sponsor_type_id'];
 
     public $timestamps = false;

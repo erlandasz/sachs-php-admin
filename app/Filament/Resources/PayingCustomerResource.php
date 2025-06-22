@@ -2,16 +2,15 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Imports\PayingCustomerImporter;
 use App\Filament\Resources\PayingCustomerResource\Pages;
 use App\Models\PayingCustomer;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Actions\ExportAction;
 use Filament\Tables\Actions\ImportAction;
 use Filament\Tables\Table;
-use App\Filament\Imports\PayingCustomerImporter;
 
 class PayingCustomerResource extends Resource
 {
