@@ -30,7 +30,7 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           port: ${{ secrets.FTP_PORT }}
           server-dir: public_html/
-          local-dir: ./resources/js/public/
+          local-dir: ./public/
 
       - name: Deploy app files to home directory
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
