@@ -6,6 +6,7 @@ use App\Filament\Resources\PanelResource\Pages;
 use App\Models\Panel;
 use Filament\Forms;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -27,7 +28,12 @@ class PanelResource extends Resource
                     ->required()
                     ->maxLength(255),
                 Forms\Components\Textarea::make('description')
-                    ->columnSpanFull(),
+                    ->columnSpanFull()->hidden(),
+                // Tables\Columns\IconColumn::make('recording')
+                //     ->label('Recording')
+                //     ->boolean()
+                //     ->trueIcon('heroicon-o-check-circle')
+                //     ->falseIcon('heroicon-o-x-circle'),
                 Forms\Components\TextInput::make('room')
                     ->maxLength(255),
                 Select::make('type')
@@ -51,7 +57,28 @@ class PanelResource extends Resource
                 Forms\Components\TimePicker::make('starts_at')
                     ->required(),
                 Forms\Components\TimePicker::make('ends_at')
-                    ->required(),
+                    ->required()
+                    ->default(now()->format('H:i'))->hidden(),
+                Fieldset::make('Recording')
+                    ->relationship('recording_url')
+                    ->schema([
+                        Forms\Components\TextInput::make('recording_name')
+                            ->label('Recording Name')
+                            ->maxLength(255)->hidden(),
+                        Forms\Components\TextInput::make('recording_link')
+                            ->label('Recording Link')
+                            ->maxLength(255),
+                        Forms\Components\Actions::make([
+                            Forms\Components\Actions\Action::make('deleteRecording')
+                                ->label('Delete Recording')
+                                ->icon('heroicon-o-trash')
+                                ->requiresConfirmation()
+                                ->action(function (Panel $record) {
+                                    $record->recordinging_url()->delete();
+                                }),
+                        ]),
+                    ])
+                    ->visibleOn('edit'),
                 Select::make('event_id')
                     ->relationship('event', 'name')
                     ->live()
@@ -74,15 +101,13 @@ class PanelResource extends Resource
 
                         return $event?->ends_at;
                     }),
-                Forms\Components\TextInput::make('recording')
-                    ->maxLength(255),
                 Forms\Components\Select::make('track')
                     ->options([
                         'track_a' => 'Track A',
                         'track_b' => 'Track B',
                         'track_c' => 'Track C',
                         'track_d' => 'Track D',
-                    ]),
+                    ])->hidden(),
             ]);
     }
 
@@ -98,17 +123,16 @@ class PanelResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('starts_at')
                     ->time(),
-                Tables\Columns\TextColumn::make('ends_at')
-                    ->time(),
                 Tables\Columns\TextColumn::make('company.name')
                     ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('event.name')
+                    ->sortable()->hidden(),
+                Tables\Columns\TextColumn::make('event.short_name')
                     ->numeric()
                     ->sortable(),
+                Tables\Columns\IconColumn::make('recording_url')->boolean(),
                 Tables\Columns\TextColumn::make('day')
                     ->date(),
-                Tables\Columns\TextColumn::make('track'),
+                Tables\Columns\TextColumn::make('track')->hidden(),
             ])
             ->filters([
                 SelectFilter::make('event_id')
@@ -143,7 +167,8 @@ class PanelResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            \App\Filament\Resources\PanelResource\RelationManagers\PersonRelationManager::class,
+            \App\Filament\Resources\PanelResource\RelationManagers\CompaniesRelationManager::class,
         ];
     }
 

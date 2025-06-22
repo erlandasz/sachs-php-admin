@@ -40,7 +40,13 @@ class EventResource extends Resource
                                     ->maxLength(255)
                                     ->unique(ignoreRecord: true),
                                 Forms\Components\TextInput::make('short_name')
-                                    ->maxLength(255),
+                                    ->maxLength(255)
+                                    ->live(onBlur: true)
+                                    ->afterStateUpdated(function (Forms\Set $set, ?string $state, string $operation) {
+                                        if ($operation === 'create') {
+                                            $set('slug', static::generateSlug($state));
+                                        }
+                                    }),
                                 Forms\Components\TextInput::make('tagline')
                                     ->maxLength(255),
                                 Forms\Components\DateTimePicker::make('starts_at'),
@@ -206,7 +212,8 @@ class EventResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            \App\Filament\Resources\EventResource\RelationManagers\PresentersRelationManager::class,
+            \App\Filament\Resources\EventResource\RelationManagers\SponsorsRelationManager::class,
         ];
     }
 
@@ -217,5 +224,20 @@ class EventResource extends Resource
             'create' => Pages\CreateEvent::route('/create'),
             'edit' => Pages\EditEvent::route('/{record}/edit'),
         ];
+    }
+
+    protected static function generateSlug(string $text): string
+    {
+        $replacedSymbols = [
+            'ą' => 'a', 'č' => 'c', 'ę' => 'e', 'ė' => 'e', 'į' => 'i', 'š' => 's',
+            'ų' => 'u', 'ū' => 'u', 'ž' => 'z',
+        ];
+
+        $stringedText = strtr($text, $replacedSymbols);
+        $gapsReplaced = preg_replace('~[^\\pL\d.]+~u', '-', $stringedText);
+        $trimmedText = trim($gapsReplaced, '-');
+        $preggedText = preg_replace('~[^-\w.]+~', '', $trimmedText);
+
+        return strtolower($preggedText);
     }
 }

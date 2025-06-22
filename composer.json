@@ -10,8 +10,11 @@
         "cloudinary-labs/cloudinary-laravel": "^3.0",
         "filament/filament": "^3.2",
         "inertiajs/inertia-laravel": "^2.0",
+        "intervention/image": "^3.11",
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10.1",
+        "league/flysystem-aws-s3-v3": "^3.29",
+        "tapp/laravel-airtable": "^3.0",
         "tightenco/ziggy": "^2.4"
     },
     "require-dev": {

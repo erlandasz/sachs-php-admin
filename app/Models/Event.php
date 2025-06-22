@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Event extends Model
 {
@@ -115,4 +116,18 @@ class Event extends Model
         'show_recordings' => 'boolean',
         'is24h' => 'boolean',
     ];
+
+    public function presenters(): BelongsToMany
+    {
+        return $this->belongsToMany(Company::class, 'event_presenter')
+            ->using(EventPresenter::class)
+            ->withPivot('presenter_type_id');
+    }
+
+    public function sponsors(): BelongsToMany
+    {
+        return $this->belongsToMany(Company::class, 'event_sponsors')
+            ->using(EventSponsor::class)
+            ->withPivot('sponsor_type_id');
+    }
 }

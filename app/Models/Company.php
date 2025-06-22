@@ -28,4 +28,18 @@ class Company extends Model
     {
         return $this->hasMany(Panel::class);
     }
+
+    public function eventsAsPresenter()
+    {
+        return $this->belongsToMany(Event::class, 'event_presenter')
+            ->using(EventPresenter::class)
+            ->withPivot('presenter_type_id');
+    }
+
+    public function eventsAsSponsor()
+    {
+        return $this->belongsToMany(Event::class, 'event_sponsor')
+            ->using(EventSponsor::class)
+            ->withPivot('sponsor_type_id');
+    }
 }

@@ -69,19 +69,14 @@ class CompanyResource extends Resource
                 Forms\Components\Textarea::make('short_v2')
                     ->columnSpanFull()->hidden(),
                 Forms\Components\Toggle::make('needs_checking'),
-                Forms\Components\TextInput::make('cloudinary_url')
-                    ->hidden(),
-                FileUpload::make('logo_upload')
+                // Forms\Components\TextInput::make('cloudinary_url')
+                //     ->hidden(),
+                FileUpload::make('cloudinary_url')
                     ->label('Company Logo')
+                    ->disk('r2')
                     ->image()
                     ->directory('company-logos')
-                    ->visibility('public')
-                    ->afterStateUpdated(function ($state, $set) {
-                        if ($state) {
-                            $uploadedFileUrl = Cloudinary::upload($state->getRealPath())->getSecurePath();
-                            $set('cloudinary_url', $uploadedFileUrl);
-                        }
-                    }),
+                    ->visibility('public'),
             ]);
     }
 
