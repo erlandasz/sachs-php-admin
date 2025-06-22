@@ -15,7 +15,10 @@
         "laravel/tinker": "^2.10.1",
         "league/flysystem-aws-s3-v3": "^3.29",
         "rawilk/laravel-printing": "^4.1",
+        "setasign/fpdf": "^1.8",
+        "setasign/fpdi": "^2.6",
         "tapp/laravel-airtable": "^3.0",
+        "tecnickcom/tcpdf": "^6.10",
         "tightenco/ziggy": "^2.4"
     },
     "require-dev": {
