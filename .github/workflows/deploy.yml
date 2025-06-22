@@ -91,7 +91,7 @@ jobs:
           username: ${{ vars.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           port: 21
-          server-dir: /
+          server-dir: ./
           local-dir: ./public/
 
       - name: Deploy app files to home directory
@@ -104,9 +104,7 @@ jobs:
           server-dir: ../
           local-dir: ./
           exclude: |
-            public/
-            node_modules/
-            .git/
-            .github/
-            tests/
-            ...
+            **/node_modules/**
+            **/.git/**
+            **/.github/**
+            **/tests/**
