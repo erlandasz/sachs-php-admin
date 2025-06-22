@@ -23,7 +23,7 @@ jobs:
           npm run build
 
       - name: Deploy public/ to public_html/
-        uses: SamKirkland/FTP-Deploy-Action@v4
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_HOST }}
           username: ${{ secrets.FTP_USERNAME }}
@@ -33,7 +33,7 @@ jobs:
           local-dir: ./resources/js/public/
 
       - name: Deploy app files to home directory
-        uses: SamKirkland/FTP-Deploy-Action@v4
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_HOST }}
           username: ${{ secrets.FTP_USERNAME }}
