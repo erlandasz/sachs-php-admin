@@ -37,7 +37,6 @@ class EventResource extends Resource
                                 Forms\Components\TextInput::make('short_name')
                                     ->maxLength(255),
                                 Forms\Components\TextInput::make('tagline')
-
                                     ->maxLength(255),
                                 Forms\Components\DateTimePicker::make('starts_at'),
                                 Forms\Components\DateTimePicker::make('ends_at'),
