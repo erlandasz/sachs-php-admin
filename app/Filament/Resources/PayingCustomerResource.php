@@ -47,19 +47,11 @@ class PayingCustomerResource extends Resource
                     ->label('Role'),
             ])
             ->filters([
-                //
             ])
             ->defaultSort('id', 'desc')
-                // ->headerActions([
-                //     ImportAction::make()->importer(PayingCustomerImporter::class),
-                // ])
             ->actions([
-                // EditAction::make(), // <-- Now this will work
             ])
             ->bulkActions([
-                // Tables\Actions\BulkActionGroup::make([
-                //     Tables\Actions\DeleteBulkAction::make(),
-                // ]),
             ]);
     }
 

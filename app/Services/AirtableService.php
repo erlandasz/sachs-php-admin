@@ -219,12 +219,9 @@ class AirtableService
         return $this->imageService->createCompanyImg($imageContent, 420, 210, 'images/compLogos/');
     }
 
-    public function loadFromAirtable(string $id)
+    public function loadSpeaker(Person $person)
     {
-        $person = Person::findOrFail($id);
-        if (empty($person->airtableId)) {
-            throw new \Exception('Cannot fetch a person without an Airtable ID');
-        }
+        $airtableId = $person->airtableId;
 
         $fields = [
             'bio' => 'Biography',
@@ -234,7 +231,7 @@ class AirtableService
             'last_name' => 'Last Name',
         ];
 
-        $airtableEntryFields = $this->getEntry($person->airtableId);
+        $airtableEntryFields = $this->getEntry($airtableId);
 
         if (isset($airtableEntryFields['Profile Picture'])) {
             $image = $airtableEntryFields['Profile Picture'];

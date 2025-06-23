@@ -5,6 +5,135 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
+/**
+ * 
+ *
+ * @property int $id
+ * @property string $short_name
+ * @property string $name
+ * @property string|null $tagline
+ * @property \Illuminate\Support\Carbon $starts_at
+ * @property \Illuminate\Support\Carbon $ends_at
+ * @property string $about
+ * @property string|null $networking_text
+ * @property string|null $networking_link
+ * @property string|null $live_link
+ * @property bool $show_live
+ * @property string|null $bottom_text
+ * @property string|null $how_to_participate
+ * @property string|null $enquiries
+ * @property bool $after_event
+ * @property bool $show_event
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property string|null $timezone
+ * @property string|null $slug
+ * @property string|null $location
+ * @property bool $show_register
+ * @property string|null $afterforum_about
+ * @property string|null $jotform
+ * @property bool $afterforum_gif_option
+ * @property string|null $afterforum_gif_location
+ * @property bool $show_supporters
+ * @property bool $show_presenters
+ * @property bool $show_exhibitors
+ * @property bool $show_agenda
+ * @property bool $show_sponsors
+ * @property bool $show_panels
+ * @property bool $show_enquiries
+ * @property bool $show_participate
+ * @property bool $show_attendees_tab
+ * @property bool $show_investors_tab
+ * @property bool $show_speakers_tab
+ * @property bool $show_speakers_section
+ * @property bool $show_presenters_section
+ * @property bool $show_risings_tab
+ * @property bool $show_faq_tab
+ * @property string|null $past_event_url
+ * @property \Illuminate\Support\Carbon|null $attendees_updated
+ * @property bool $show_risings_about
+ * @property bool|null $show_right
+ * @property bool $show_venue
+ * @property string|null $pdf_agenda
+ * @property bool $show_photos
+ * @property bool $show_floor_plan
+ * @property bool $show_recordings
+ * @property bool $is24h
+ * @property string $country
+ * @property string|null $reception
+ * @property string|null $in_person_meetings
+ * @property string|null $online_virtual_meetings
+ * @property string|null $airtable_base aitable base in format app...
+ * @property string|null $airtable_name airtable table name (usually Registrations)
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Panel> $panels
+ * @property-read int|null $panels_count
+ * @property-read \App\Models\EventSponsor|\App\Models\EventPresenter|null $pivot
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Company> $presenters
+ * @property-read int|null $presenters_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Company> $sponsors
+ * @property-read int|null $sponsors_count
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereAbout($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereAfterEvent($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereAfterforumAbout($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereAfterforumGifLocation($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereAfterforumGifOption($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereAirtableBase($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereAirtableName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereAttendeesUpdated($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereBottomText($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereCountry($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereEndsAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereEnquiries($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereHowToParticipate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereInPersonMeetings($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereIs24h($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereJotform($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereLiveLink($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereLocation($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereNetworkingLink($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereNetworkingText($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereOnlineVirtualMeetings($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event wherePastEventUrl($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event wherePdfAgenda($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereReception($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereShortName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereShowAgenda($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereShowAttendeesTab($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereShowEnquiries($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereShowEvent($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereShowExhibitors($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereShowFaqTab($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereShowFloorPlan($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereShowInvestorsTab($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereShowLive($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereShowPanels($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereShowParticipate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereShowPhotos($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereShowPresenters($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereShowPresentersSection($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereShowRecordings($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereShowRegister($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereShowRight($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereShowRisingsAbout($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereShowRisingsTab($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereShowSpeakersSection($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereShowSpeakersTab($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereShowSponsors($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereShowSupporters($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereShowVenue($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereSlug($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereStartsAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereTagline($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereTimezone($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
 class Event extends Model
 {
     /**

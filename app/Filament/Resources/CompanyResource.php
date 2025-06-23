@@ -4,7 +4,6 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CompanyResource\Pages;
 use App\Models\Company;
-use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use Filament\Forms;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Form;
@@ -69,8 +68,6 @@ class CompanyResource extends Resource
                 Forms\Components\Textarea::make('short_v2')
                     ->columnSpanFull()->hidden(),
                 Forms\Components\Toggle::make('needs_checking'),
-                // Forms\Components\TextInput::make('cloudinary_url')
-                //     ->hidden(),
                 FileUpload::make('cloudinary_url')
                     ->label('Company Logo')
                     ->disk('r2')
@@ -86,16 +83,6 @@ class CompanyResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
-                // Tables\Columns\TextColumn::make('phone_no')
-                //     ->searchable(),
-                // Tables\Columns\TextColumn::make('email')
-                //     ->searchable(),
-                // Tables\Columns\TextColumn::make('city')
-                //     ->searchable(),
-                // Tables\Columns\TextColumn::make('country')
-                //     ->searchable(),
-                // Tables\Columns\TextColumn::make('type')
-                //     ->searchable(),
                 Tables\Columns\IconColumn::make('needs_checking')
                     ->boolean(),
             ])

@@ -3,12 +3,21 @@
 namespace App\Observers;
 
 use App\Models\Person;
+use App\Services\AirtableService;
 use App\Services\CustomUploader;
 use Illuminate\Support\Facades\Storage;
 
 class PersonObserver
 {
-    public function saving(Person $person)
+
+    protected AirtableService $airtableService;
+
+    public function __construct(AirtableService $airtableService)
+    {
+        $this->airtableService = $airtableService;
+    }
+
+    public function saving(Person $person): void
     {
         if ($person->isDirty('photo')) {
             $uploader = new CustomUploader;
@@ -42,7 +51,9 @@ class PersonObserver
      */
     public function updated(Person $person): void
     {
-        //
+        if ($person->isDirty('airtableId')) {
+            $entry = $this->airtableService->loadSpeaker($person);
+        }
     }
 
     /**

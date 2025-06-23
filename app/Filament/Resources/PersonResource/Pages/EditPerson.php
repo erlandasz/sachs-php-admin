@@ -25,37 +25,10 @@ class EditPerson extends EditRecord
         ];
     }
 
-    public function loadFromAirtable($record): void
+    public function loadFromAirtable(Person $record): void
     {
         $airtableService = app()->make(AirtableService::class);
-
-        if (empty($record->airtableId)) {
-            throw new \Exception('Cannot fetch a person without an Airtable Id');
-        }
-
-        $fields = [
-            'bio' => 'Biography',
-            'job_title' => 'Job Title',
-            'companyName' => 'Company Name',
-            'first_name' => 'First Name',
-            'last_name' => 'Last Name',
-        ];
-
-        $airtableEntryFields = $airtableService->getEntry($record->airtableId);
-
-        if (isset($airtableEntryFields['Profile Picture'])) {
-            $image = $airtableEntryFields['Profile Picture'];
-            if (isset($image) && isset($image[0]) && isset($image[0]['url'])) {
-                $imageName = $airtableService->extractProfilePicture($image[0]['url']);
-                $record->photo = $imageName ?? 'noPic.png';
-            }
-        }
-
-        foreach ($fields as $property => $fieldName) {
-            $record->$property = ! empty($airtableEntryFields[$fieldName]) ? str_replace("\n\n", "\n", $airtableEntryFields[$fieldName]) : '-';
-        }
-
-        $record->save();
+        $airtableService->loadSpeaker($record);
 
         Notification::make()
             ->title('Success')
