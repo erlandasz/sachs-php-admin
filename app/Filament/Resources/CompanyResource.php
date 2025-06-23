@@ -86,16 +86,16 @@ class CompanyResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('phone_no')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('email')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('city')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('country')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('type')
-                    ->searchable(),
+                // Tables\Columns\TextColumn::make('phone_no')
+                //     ->searchable(),
+                // Tables\Columns\TextColumn::make('email')
+                //     ->searchable(),
+                // Tables\Columns\TextColumn::make('city')
+                //     ->searchable(),
+                // Tables\Columns\TextColumn::make('country')
+                //     ->searchable(),
+                // Tables\Columns\TextColumn::make('type')
+                //     ->searchable(),
                 Tables\Columns\IconColumn::make('needs_checking')
                     ->boolean(),
             ])

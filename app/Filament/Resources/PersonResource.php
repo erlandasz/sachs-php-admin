@@ -84,6 +84,7 @@ class PersonResource extends Resource
                     ->default('noPic.png'),
                 Tables\Columns\TextColumn::make('full_name')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('companyName'),
                 Tables\Columns\TextColumn::make('job_title')
                     ->searchable(),
                 Tables\Columns\IconColumn::make('needs_checking')
