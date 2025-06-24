@@ -3,10 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 /**
- * 
- *
  * @property int $id
  * @property string $name
  * @property string|null $phone_no
@@ -41,6 +41,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property-read int|null $events_as_sponsor_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Panel> $panel
  * @property-read int|null $panel_count
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company query()
@@ -71,10 +72,13 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereWebsite($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company whereZip($value)
+ *
  * @mixin \Eloquent
  */
 class Company extends Model
 {
+    use LogsActivity;
+
     /**
      * The database connection that should be used by the model.
      *
@@ -110,5 +114,10 @@ class Company extends Model
         return $this->belongsToMany(Event::class, 'event_sponsor')
             ->using(EventSponsor::class)
             ->withPivot('sponsor_type_id');
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults();
     }
 }

@@ -4,10 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 /**
- * 
- *
  * @property int $id
  * @property string $short_name
  * @property string $name
@@ -72,6 +72,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property-read int|null $presenters_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Company> $sponsors
  * @property-read int|null $sponsors_count
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Event newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Event newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Event query()
@@ -132,10 +133,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereTagline($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereTimezone($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class Event extends Model
 {
+    use LogsActivity;
+
     /**
      * The database connection that should be used by the model.
      *
@@ -260,5 +264,10 @@ class Event extends Model
     public function panels()
     {
         return $this->hasMany(Panel::class);
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults();
     }
 }

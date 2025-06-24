@@ -4,10 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 /**
- * 
- *
  * @property int $id
  * @property string $first_name
  * @property string $last_name
@@ -23,6 +23,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property string $last_activity
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Role> $roles
  * @property-read int|null $roles_count
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PortalUser newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PortalUser newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PortalUser query()
@@ -39,10 +40,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PortalUser whereRememberToken($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PortalUser whereRole($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PortalUser whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class PortalUser extends Model
 {
+    use LogsActivity;
+
     protected $connection = 'mysql_hostinger';
 
     protected $table = 'users';
@@ -66,5 +70,10 @@ class PortalUser extends Model
     public function roles(): BelongsToMany
     {
         return $this->belongsToMany(Role::class, 'user_role', 'user_id', 'role_id');
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults();
     }
 }

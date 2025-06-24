@@ -6,8 +6,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 
 /**
- * 
- *
  * @property int $id
  * @property int $event_id
  * @property int $company_id
@@ -15,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
  * @property-read \App\Models\Company $company
  * @property-read \App\Models\Event $event
  * @property-read \App\Models\SponsorType $sponsorType
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|EventSponsor newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|EventSponsor newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|EventSponsor query()
@@ -22,6 +21,7 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|EventSponsor whereEventId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|EventSponsor whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|EventSponsor whereSponsorTypeId($value)
+ *
  * @mixin \Eloquent
  */
 class EventSponsor extends Pivot

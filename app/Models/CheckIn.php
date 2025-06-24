@@ -4,10 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 /**
- * 
- *
  * @property int $id
  * @property string $first_name
  * @property string $last_name
@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property string|null $checkin_comment comment
  * @property-read \App\Models\PortalUser|null $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CheckIn newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CheckIn newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CheckIn query()
@@ -34,10 +35,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CheckIn whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CheckIn whereLastName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CheckIn whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class CheckIn extends Model
 {
+    use LogsActivity;
+
     protected $connection = 'mysql_hostinger';
 
     protected $fillable = [
@@ -61,5 +65,10 @@ class CheckIn extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(PortalUser::class, 'checking_in_user_id');
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults();
     }
 }

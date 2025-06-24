@@ -6,10 +6,10 @@ use App\SpeakerType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 /**
- * 
- *
  * @property int $id
  * @property string $name
  * @property string|null $description
@@ -34,6 +34,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property-read \App\Models\PanelRecording|null $recording_url
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Person> $speaker
  * @property-read int|null $speaker_count
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Panel newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Panel newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Panel query()
@@ -51,10 +52,13 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Panel whereTrack($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Panel whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Panel whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class Panel extends Model
 {
+    use LogsActivity;
+
     /**
      * The database connection that should be used by the model.
      *
@@ -123,5 +127,10 @@ class Panel extends Model
     public function recording_url(): HasOne
     {
         return $this->hasOne(PanelRecording::class);
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults();
     }
 }

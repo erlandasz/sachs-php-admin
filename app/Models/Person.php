@@ -5,10 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\Storage;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 /**
- * 
- *
  * @property int $id
  * @property string $title
  * @property string $first_name
@@ -32,6 +32,7 @@ use Illuminate\Support\Facades\Storage;
  * @property-read mixed $preview_image_url
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Panel> $panels
  * @property-read int|null $panels_count
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Person newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Person newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Person query()
@@ -55,10 +56,13 @@ use Illuminate\Support\Facades\Storage;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Person whereTwitter($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Person whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Person whereUserId($value)
+ *
  * @mixin \Eloquent
  */
 class Person extends Model
 {
+    use LogsActivity;
+
     /**
      * The database connection that should be used by the model.
      *
@@ -127,5 +131,10 @@ class Person extends Model
         static::updating(function ($person) {
             $person->full_name = $person->first_name.' '.$person->last_name;
         });
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults();
     }
 }
