@@ -10,7 +10,7 @@ use Rawilk\Printing\Facades\Printing as PPPP;
 
 class PrintingService
 {
-    public function checkIn($id, $printerId)
+    public function checkIn($id, $printerId, ?bool $is_test = false)
     {
         $attendee = CheckIn::findOrFail($id);
         $eventsAttended = $attendee->events_attended;
@@ -24,9 +24,13 @@ class PrintingService
         $file_path = $this->print($attendee->first_name, $attendee->last_name, $attendee->company_name, $attendee->id, $roleColors, $printerId);
         $this->markAsCheckedIn($id);
 
-        if (file_exists($file_path) && app()->environment('production')) {
+        if (file_exists($file_path) && app()->environment('production') && ! $is_test) {
             unlink($file_path);
         }
+
+        logger($file_path);
+
+        return $file_path;
     }
 
     private function markAsCheckedIn($checkInId): void
@@ -39,11 +43,11 @@ class PrintingService
         $checkIn->save();
     }
 
-    private function print($firstName, $lastName, $companyName, $id, $color, $printerId)
+    private function print(string $firstName, string $lastName, string $companyName, int|string $id, $color, $printerId, ?bool $is_test = false)
     {
         $outputFile = $this->fillPDFFile($firstName, $lastName, $companyName, $color);
 
-        if (app()->environment('production')) {
+        if (app()->environment('production') && ! $is_test) {
             PPPP::newPrintTask()
                 ->printer($printerId)
                 ->file($outputFile)

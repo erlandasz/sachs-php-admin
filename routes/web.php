@@ -13,5 +13,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('dashboard');
 });
 
+Route::middleware(['web', 'auth'])
+    ->get('/private-pdf/badges/{filename}', function ($filename) {
+        $path = 'pdf/badges/'.$filename;
+        if (! Storage::disk('private')->exists($path)) {
+            abort(404);
+        }
+
+        return response()->file(Storage::disk('private')->path($path));
+    })
+    ->name('private.pdf.badge');
+
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';

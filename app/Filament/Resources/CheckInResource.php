@@ -7,6 +7,7 @@ use App\Models\CheckIn;
 use App\Services\PrintingService;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Actions\Action as NotificationAction;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -83,6 +84,27 @@ class CheckInResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Action::make('preview')
+                    ->label('Preview PDF')
+                    ->action(function ($record) {
+                        $printerId = $livewire->selectedPrinterId ?? 'No printer selected';
+
+                        $printingService = app(PrintingService::class);
+                        $file_path = $printingService->checkIn($record->id, $printerId, true);
+                        $filename = basename($file_path);
+                        $url = route('private.pdf.badge', ['filename' => $filename]);
+                        Notification::make()
+                            ->title('PDF Ready')
+                            ->body('Click to open the PDF in a new tab.')
+                            ->actions([
+                                NotificationAction::make('open')
+                                    ->label('Open PDF')
+                                    ->url($url)
+                                    ->openUrlInNewTab(),
+                            ])
+                            ->send();
+                    })
+                    ->tooltip('Preview the PDF'),
                 Action::make('logCheckInAndPrinter')
                     ->label('Print')
                     ->icon('heroicon-o-bell')
