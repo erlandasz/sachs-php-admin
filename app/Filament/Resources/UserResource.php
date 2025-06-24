@@ -5,12 +5,12 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
 use Filament\Forms;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Forms\Components\Section;
 
 class UserResource extends Resource
 {
@@ -31,20 +31,20 @@ class UserResource extends Resource
                 TextInput::make('password')
                     ->password()
                     ->hidden(fn (string $context): bool => $context === 'edit')
-                    ->required(fn (string $context): bool => $context === 'create')
+                    ->required(fn (string $context): bool => $context === 'create'),
                 Select::make('roles')
                     ->relationship('roles', 'name')
                     ->multiple()
                     ->preload()
                     ->searchable(),
                 Section::make('Permissions')
-                        ->schema([
-                            CheckboxList::make('permissions')
-                                ->relationship('permissions', 'name')
-                                ->searchable(),
-                        ])
-                        ->collapsible()
-                        ->collapsed()
+                    ->schema([
+                        CheckboxList::make('permissions')
+                            ->relationship('permissions', 'name')
+                            ->searchable(),
+                    ])
+                    ->collapsible()
+                    ->collapsed(),
             ]);
     }
 
