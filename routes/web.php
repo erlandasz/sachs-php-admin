@@ -16,9 +16,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::middleware(['web', 'auth'])
     ->get('/private-pdf/badges/{filename}', function ($filename) {
         $path = 'pdf/badges/'.$filename;
-        if (! Storage::disk('private')->exists($path)) {
-            abort(404);
-        }
 
         return response()->file(Storage::disk('private')->path($path));
     })
