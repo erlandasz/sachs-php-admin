@@ -35,6 +35,9 @@ class UserResource extends Resource
                     ->multiple()
                     ->preload()
                     ->searchable(),
+                Forms\Components\CheckboxList::make('permissions')
+                    ->relationship('permissions', 'name')
+                    ->searchable(),
             ]);
     }
 
