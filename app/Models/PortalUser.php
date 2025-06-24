@@ -21,7 +21,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property string|null $last_login
  * @property string|null $email_verification_token
  * @property string $last_activity
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Role> $roles
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\PortalRole> $roles
  * @property-read int|null $roles_count
  *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PortalUser newModelQuery()
@@ -69,7 +69,7 @@ class PortalUser extends Model
 
     public function roles(): BelongsToMany
     {
-        return $this->belongsToMany(Role::class, 'user_role', 'user_id', 'role_id');
+        return $this->belongsToMany(PortalRole::class, 'user_role', 'user_id', 'role_id');
     }
 
     public function getActivitylogOptions(): LogOptions

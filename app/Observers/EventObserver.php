@@ -3,7 +3,7 @@
 namespace App\Observers;
 
 use App\Models\Event;
-use App\Models\Role;
+use App\Models\PortalRole;
 
 class EventObserver
 {
@@ -13,17 +13,17 @@ class EventObserver
     public function created(Event $event): void
     {
 
-        $role = new Role([
+        $role = new PortalRole([
             'name' => $event->slug,
         ]);
         $role->save();
 
-        $viewOnly = new Role([
+        $viewOnly = new PortalRole([
             'name' => $event->slug.'-viewOnly',
         ]);
         $viewOnly->save();
 
-        $noMeetings = new Role([
+        $noMeetings = new PortalRole([
             'name' => $event->slug.'-noMeetings',
         ]);
         $noMeetings->save();

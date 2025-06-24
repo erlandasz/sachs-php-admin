@@ -5,8 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * 
- *
  * @property int $id
  * @property string $user_email
  * @property int $role_id
@@ -18,7 +16,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property string|null $comment
  * @property \Illuminate\Support\Carbon|null $checked_in_at
  * @property int|null $checking_in_user_id
- * @property-read \App\Models\Role|null $role
+ * @property-read \App\Models\PortalRole|null $role
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PayingCustomer newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PayingCustomer newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PayingCustomer query()
@@ -33,6 +32,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PayingCustomer whereLastName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PayingCustomer whereRoleId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PayingCustomer whereUserEmail($value)
+ *
  * @mixin \Eloquent
  */
 class PayingCustomer extends Model
@@ -55,6 +55,6 @@ class PayingCustomer extends Model
 
     public function role()
     {
-        return $this->belongsTo(Role::class, 'role_id');
+        return $this->belongsTo(PortalRole::class, 'role_id');
     }
 }

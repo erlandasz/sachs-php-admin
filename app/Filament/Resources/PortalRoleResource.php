@@ -2,17 +2,23 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\RoleResource\Pages;
-use App\Models\Role;
+use App\Filament\Resources\PortalRoleResource\Pages;
+use App\Models\PortalRole;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Auth;
 
-class RoleResource extends Resource
+class PortalRoleResource extends Resource
 {
-    protected static ?string $model = Role::class;
+    public static function canViewAny(): bool
+    {
+        return Auth::check() && Auth::user()->hasRole('super_admin');
+    }
+
+    protected static ?string $model = PortalRole::class;
 
     protected static ?string $navigationGroup = 'Utils';
 
@@ -58,9 +64,9 @@ class RoleResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListRoles::route('/'),
-            'create' => Pages\CreateRole::route('/create'),
-            'edit' => Pages\EditRole::route('/{record}/edit'),
+            'index' => Pages\ListPortalRoles::route('/'),
+            'create' => Pages\CreatePortalRole::route('/create'),
+            'edit' => Pages\EditPortalRole::route('/{record}/edit'),
         ];
     }
 }
