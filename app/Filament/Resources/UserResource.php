@@ -46,6 +46,12 @@ class UserResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('roles.name')
+                    ->label('Roles')
+                    ->sortable()
+                    ->toggleable()
+                    ->wrap()
+                    ->getStateUsing(fn ($record) => $record->roles->pluck('name')->join(', ')),
                 // Tables\Columns\TextColumn::make('email_verified_at')
                 //     ->dateTime()
                 //     ->sortable(),
