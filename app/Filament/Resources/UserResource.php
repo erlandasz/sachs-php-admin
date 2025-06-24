@@ -39,7 +39,7 @@ class UserResource extends Resource
                     ->searchable(),
                 Section::make('Permissions')
                     ->schema([
-                        CheckboxList::make('permissions')
+                        Forms\Components\CheckboxList::make('permissions')
                             ->relationship('permissions', 'name')
                             ->searchable(),
                     ])
