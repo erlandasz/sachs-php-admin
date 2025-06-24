@@ -28,7 +28,7 @@ class UserResource extends Resource
                     ->email()
                     ->required(),
                 // Forms\Components\DateTimePicker::make('email_verified_at'),
-                TextInput::make('password')
+                Forms\Components\TextInput::make('password')
                     ->password()
                     ->hidden(fn (string $context): bool => $context === 'edit')
                     ->required(fn (string $context): bool => $context === 'create'),
