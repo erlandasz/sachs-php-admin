@@ -10,6 +10,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Forms\Components\Section;
 
 class UserResource extends Resource
 {
@@ -27,17 +28,23 @@ class UserResource extends Resource
                     ->email()
                     ->required(),
                 // Forms\Components\DateTimePicker::make('email_verified_at'),
-                Forms\Components\TextInput::make('password')
+                TextInput::make('password')
                     ->password()
-                    ->required(),
+                    ->hidden(fn (string $context): bool => $context === 'edit')
+                    ->required(fn (string $context): bool => $context === 'create')
                 Select::make('roles')
                     ->relationship('roles', 'name')
                     ->multiple()
                     ->preload()
                     ->searchable(),
-                Forms\Components\CheckboxList::make('permissions')
-                    ->relationship('permissions', 'name')
-                    ->searchable(),
+                Section::make('Permissions')
+                        ->schema([
+                            CheckboxList::make('permissions')
+                                ->relationship('permissions', 'name')
+                                ->searchable(),
+                        ])
+                        ->collapsible()
+                        ->collapsed()
             ]);
     }
 
