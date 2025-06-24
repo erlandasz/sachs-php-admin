@@ -23,7 +23,9 @@ class BadgeService extends Fpdi
 
     public function AddTextRows(string $row1, string $row2, string $row3, $color): void
     {
-        $this->setInitialValues();
+        $settings = PrintingSettings::where('name', 'Default');
+
+        $this->setInitialValues($settings);
 
         [$row1, $row2, $row3] = $this->replaceNonRegularCharacters([$row1, $row2, $row3]);
 
@@ -31,13 +33,14 @@ class BadgeService extends Fpdi
 
         [$row1Dimensions, $row2Dimensions, $row3Dimensions] = $this->getRowDimensions([$row1, $row2, $row3]);
 
+        $y_offset = $settings->y_offset;
         // smaller number means HIGHER on paper
-        $y = $this->GetY() + 45; // WAS 35, 40
+        $y = $this->GetY() + $y_offset; // WAS 35, 40
 
-        $this->displayText($row1, $y, $row1Dimensions);
+        $this->displayText($row1, $y, $row1Dimensions, $settings);
 
         // Row 2
-        $this->SetFont('Times', 'B', $row2Dimensions['fontSize']);
+        $this->SetFont($settings->font_family, $settings->font_weight, $row2Dimensions['fontSize']);
         $this->SetY($this->GetY() + $row1Dimensions['rowHeight'] - 2);
         $this->Cell($this->availableWidth, $row2Dimensions['rowHeight'], $row2, 0, 1, 'C');
 
@@ -87,7 +90,7 @@ class BadgeService extends Fpdi
         // $this->Rect(0, $this->GetPageHeight() - 35.55, $this->GetPageWidth(), 11, 'F');
     }
 
-    private function displayText(string $text, int $y, array $dimensions): void
+    private function displayText(string $text, int $y, array $dimensions, PrintingSettings $settings): void
     {
         $fontSize = $dimensions['fontSize'];
         $rowHeight = $dimensions['rowHeight'];
@@ -96,7 +99,7 @@ class BadgeService extends Fpdi
 
         $this->SetY($y);
 
-        $this->SetFont('Times', 'B', $fontSize);
+        $this->SetFont($settings->font_family, $settings->font_weight, $fontSize);
 
         $this->Cell($this->availableWidth, $rowHeight, $text, 0, 1, 'C');
     }
@@ -135,11 +138,11 @@ class BadgeService extends Fpdi
         ];
     }
 
-    private function setInitialValues(): void
+    private function setInitialValues(PrintingSettings $settings): void
     {
         $this->SetTextColor(0, 0, 0);
 
-        $this->baseFontSize = 32;
+        $this->baseFontSize = $settings->base_font_size;
 
         $this->SetFont('Times', '', $this->baseFontSize);
     }
