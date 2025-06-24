@@ -30,11 +30,12 @@ class BadgeService extends Fpdi
 
         [$row1, $row2, $row3] = $this->replaceNonRegularCharacters([$row1, $row2, $row3]);
 
-        $this->availableWidth = $this->GetPageWidth() - $this->GetPageWidth() * 0.1 * 2; // Updated to 90% of the page width
+        $this->availableWidth = $this->GetPageWidth() * $settings->available_width_multiplier; // Updated to 90% of the page width
 
         [$row1Dimensions, $row2Dimensions, $row3Dimensions] = $this->getRowDimensions([$row1, $row2, $row3]);
 
         $y_offset = $settings->y_offset;
+
         // smaller number means HIGHER on paper
         $y = $this->GetY() + $y_offset; // WAS 35, 40
 
@@ -46,7 +47,7 @@ class BadgeService extends Fpdi
         $this->Cell($this->availableWidth, $row2Dimensions['rowHeight'], $row2, 0, 1, 'C');
 
         // row3
-        $this->SetFont('Times', 'B', $row3Dimensions['fontSize']);
+        $this->SetFont($settings->font_family, $settings->font_weight, $row3Dimensions['fontSize']);
         $this->SetY($this->GetY() + $row2Dimensions['rowHeight'] + 8);
 
         $maxLineLength = 15;
@@ -81,7 +82,7 @@ class BadgeService extends Fpdi
             $this->SetX($this->GetPageWidth() * 0.1);
             $this->Cell($this->availableWidth, $row3Dimensions['rowHeight'], $secondPart, 0, 1, 'C');
         } else {
-            $this->SetFont('Times', 'B', $row3Dimensions['fontSize']);
+            $this->SetFont($settings->font_family, $settings->font_weight, $row3Dimensions['fontSize']);
             $this->SetX($this->GetPageWidth() * 0.1);
             $this->SetY(95); // Set Y position to the initial value WAS 101
             $this->Cell($this->availableWidth, $row3Dimensions['rowHeight'], $row3, 0, 1, 'C');
@@ -148,6 +149,6 @@ class BadgeService extends Fpdi
 
         $this->baseFontSize = $settings->base_font_size;
 
-        $this->SetFont('Times', '', $this->baseFontSize);
+        $this->SetFont($settings->font_family, $settings->font_weight, $this->baseFontSize);
     }
 }
