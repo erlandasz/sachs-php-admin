@@ -69,7 +69,7 @@ class ListCheckIns extends ListRecords
      *     status: string
      * }>
      */
-    public function getPrinters(): array
+    public function getPrinters()
     {
         $printers = PPPP::printers();
 

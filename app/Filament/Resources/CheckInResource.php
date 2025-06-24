@@ -42,11 +42,12 @@ class CheckInResource extends Resource
                     ->default(null),
                 Forms\Components\TextInput::make('checked_in')
                     ->required()
-                    ->numeric(),
+                    ->numeric()->hidden(),
                 Forms\Components\DatePicker::make('checked_in_at'),
                 Forms\Components\TextInput::make('events_attended')
                     ->required()
-                    ->maxLength(255),
+                    ->default('1')
+                    ->maxLength(255)->helperText('E.g. 1,2,3 if attending 3 days of event, leave 1 if not relevant'),
                 Forms\Components\TextInput::make('checkin_comment')
                     ->maxLength(255)
                     ->default(null),

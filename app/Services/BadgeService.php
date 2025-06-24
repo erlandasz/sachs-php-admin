@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\PrintingSettings;
 use setasign\Fpdi\Tcpdf\Fpdi;
 
 class BadgeService extends Fpdi
@@ -23,7 +24,7 @@ class BadgeService extends Fpdi
 
     public function AddTextRows(string $row1, string $row2, string $row3, $color): void
     {
-        $settings = PrintingSettings::where('name', 'Default');
+        $settings = PrintingSettings::where('is_default', true)->firstOrFail();
 
         $this->setInitialValues($settings);
 
@@ -86,8 +87,11 @@ class BadgeService extends Fpdi
             $this->Cell($this->availableWidth, $row3Dimensions['rowHeight'], $row3, 0, 1, 'C');
         }
 
-        // $this->SetFillColor($color['red'], $color['green'], $color['blue']);
-        // $this->Rect(0, $this->GetPageHeight() - 35.55, $this->GetPageWidth(), 11, 'F');
+        if ($settings->has_colors) {
+            $this->SetFillColor($color['r'], $color['g'], $color['b']);
+            $this->Rect(0, $this->GetPageHeight() - 35.55, $this->GetPageWidth(), 11, 'F');
+        }
+
     }
 
     private function displayText(string $text, int $y, array $dimensions, PrintingSettings $settings): void

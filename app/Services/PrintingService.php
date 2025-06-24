@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\CheckIn;
+use App\Models\PrintingSettings;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Rawilk\Printing\Facades\Printing as PPPP;
@@ -23,12 +24,12 @@ class PrintingService
         $file_path = $this->print($attendee->first_name, $attendee->last_name, $attendee->company_name, $attendee->id, $roleColors, $printerId);
         $this->markAsCheckedIn($id);
 
-        if (file_exists($file_path)) {
+        if (file_exists($file_path) && app()->environment('production')) {
             unlink($file_path);
         }
     }
 
-    private function markAsCheckedIn($checkInId)
+    private function markAsCheckedIn($checkInId): void
     {
         $checkIn = CheckIn::findOrFail($checkInId);
 
@@ -36,8 +37,6 @@ class PrintingService
         $checkIn->checked_in_at = now();
 
         $checkIn->save();
-
-        return $checkIn;
     }
 
     private function print($firstName, $lastName, $companyName, $id, $color, $printerId)
@@ -54,7 +53,7 @@ class PrintingService
         return $outputFile;
     }
 
-    private function fillPDFFile($firstName, $lastName, $companyName, $color): string
+    private function fillPDFFile(string $firstName, string $lastName, string $companyName, $color): string
     {
         $templatePath = Storage::path('pdf/template.pdf');
         $uuid = Str::uuid()->toString();
@@ -80,52 +79,18 @@ class PrintingService
 
     private function pickColor($has_day_one, $has_day_two, $has_day_three)
     {
-        $blue = [
-            'red' => 29,
-            'green' => 69,
-            'blue' => 136,
-        ];
-
-        $lightBlue = [
-            'red' => 173,
-            'green' => 216,
-            'blue' => 230,
-        ];
-
-        $red = [
-            'red' => 220,
-            'green' => 33,
-            'blue' => 42,
-        ];
-
-        $purple = [
-            'red' => 109,
-            'green' => 97,
-            'blue' => 150,
-        ];
-
-        $green = [
-            'red' => 112,
-            'green' => 173,
-            'blue' => 71,
-        ];
-
-        $orange = [
-            'red' => 255,
-            'green' => 165,
-            'blue' => 0,
-        ];
+        $settings = PrintingSettings::where('is_default', true)->first();
 
         if ($has_day_one && $has_day_two && $has_day_three) {
-            return $green;
+            return $settings->getAllDaysColor();
         }
 
         if ($has_day_one && $has_day_two) {
-            return $purple;
+            return $settings->getDays1And2Color();
         }
 
         if ($has_day_two && $has_day_three) {
-            return $red;
+            return $settings->getDays2And3Color();
         }
 
         if ($has_day_one && $has_day_three) {
@@ -133,15 +98,15 @@ class PrintingService
         }
 
         if ($has_day_one) {
-            return $blue;
+            return $settings->getDay1Color();
         }
 
         if ($has_day_two) {
-            return $orange;
+            return $settings->getDay2Color();
         }
 
         if ($has_day_three) {
-            return $purple;
+            return $settings->getDay3Color();
         }
 
         return [
