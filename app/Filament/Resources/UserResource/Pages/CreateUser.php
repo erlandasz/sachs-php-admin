@@ -5,7 +5,6 @@ namespace App\Filament\Resources\UserResource\Pages;
 use App\Filament\Resources\UserResource;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 
 class CreateUser extends CreateRecord
 {
@@ -15,7 +14,7 @@ class CreateUser extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        $this->userPlainPassword = Str::random(12);
+        $this->userPlainPassword = 'labadiena';
         $data['password'] = Hash::make($this->userPlainPassword);
 
         return $data;
