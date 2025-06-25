@@ -21,7 +21,7 @@ class PrintingService
 
         $roleColors = $this->pickColor($has_day_one, $has_day_two, $has_day_three);
 
-        $file_path = $this->print($attendee->first_name, $attendee->last_name, $attendee->company_name, $attendee->id, $roleColors, $printerId);
+        $file_path = $this->print($attendee->first_name, $attendee->last_name, $attendee->company_name, $attendee->id, $roleColors, $printerId, $is_test);
         $this->markAsCheckedIn($id);
 
         if (file_exists($file_path) && app()->environment('production') && ! $is_test) {
