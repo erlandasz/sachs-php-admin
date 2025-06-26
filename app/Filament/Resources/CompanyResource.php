@@ -25,42 +25,42 @@ class CompanyResource extends Resource
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('phone_no')
-                    ->maxLength(255)->hidden(),
+                    ->maxLength(255),
                 Forms\Components\TextInput::make('website')
-                    ->maxLength(255)->hidden(),
+                    ->maxLength(255),
                 Forms\Components\TextInput::make('founded')
-                    ->numeric()->hidden(),
+                    ->numeric(),
                 Forms\Components\TextInput::make('email')
                     ->email()
-                    ->maxLength(255)->hidden(),
+                    ->maxLength(255),
                 Forms\Components\TextInput::make('logo_name')
-                    ->maxLength(255)->hidden(),
+                    ->maxLength(255),
                 Forms\Components\TextInput::make('type')
-                    ->maxLength(255)->hidden(),
+                    ->maxLength(255),
                 Forms\Components\TextInput::make('ticker')
-                    ->maxLength(255)->hidden(),
+                    ->maxLength(255),
                 Forms\Components\Textarea::make('profile')
                     ->columnSpanFull(),
                 Forms\Components\Textarea::make('short_profile')
                     ->columnSpanFull(),
                 Forms\Components\Textarea::make('financial_summary')
-                    ->columnSpanFull()->hidden(),
+                    ->columnSpanFull(),
                 Forms\Components\Textarea::make('address')
-                    ->columnSpanFull()->hidden(),
+                    ->columnSpanFull(),
                 Forms\Components\Textarea::make('sector')
-                    ->columnSpanFull()->hidden(),
+                    ->columnSpanFull(),
                 Forms\Components\TextInput::make('airtableId')
                     ->maxLength(64),
                 Forms\Components\TextInput::make('city')
-                    ->maxLength(255)->hidden(),
+                    ->maxLength(255),
                 Forms\Components\TextInput::make('country')
-                    ->maxLength(255)->hidden(),
+                    ->maxLength(255),
                 Forms\Components\TextInput::make('zip')
-                    ->maxLength(255)->hidden(),
+                    ->maxLength(255),
                 Forms\Components\TextInput::make('street')
-                    ->maxLength(255)->hidden(),
+                    ->maxLength(255),
                 Forms\Components\TextInput::make('state')
-                    ->maxLength(255)->hidden(),
+                    ->maxLength(255),
                 Forms\Components\Textarea::make('airtableLogo')
                     ->columnSpanFull()->hidden(),
                 Forms\Components\TextInput::make('nif_airtable_id')
