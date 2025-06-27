@@ -68,6 +68,12 @@ class EditCompany extends EditRecord
 
     protected function copyToClipboard(string $value): void
     {
-        $this->notify('success', 'Copied to clipboard!');
+        $this->dispatch('copyToClipboard', clipboardValue: $value);
+
+        $this->dispatch(
+            'notify',
+            type: 'success',
+            message: 'Copied to clipboard!',
+        );
     }
 }
