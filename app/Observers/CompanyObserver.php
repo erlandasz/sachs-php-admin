@@ -21,9 +21,21 @@ class CompanyObserver
                 );
 
                 $result = $uploader->uploadCompanyLogo($file);
+                // Delete the local file after upload
+                Storage::disk('local')->delete($filePath);
                 $company->logo_name = null;
                 $company->cloudinary_url = $result;
                 $company->save();
+            }
+        }
+
+        // Delete logo from r2 if being unset
+        if ($company->isDirty('cloudinary_url') && blank($company->cloudinary_url)) {
+            $original = $company->getOriginal('cloudinary_url');
+            if ($original) {
+                $parsed = parse_url($original);
+                $path = ltrim($parsed['path'], '/');
+                \Illuminate\Support\Facades\Storage::disk('r2')->delete($path);
             }
         }
     }
@@ -49,7 +61,12 @@ class CompanyObserver
      */
     public function deleted(Company $company): void
     {
-        //
+        if ($company->cloudinary_url) {
+            $url = $company->cloudinary_url;
+            $parsed = parse_url($url);
+            $path = ltrim($parsed['path'], '/');
+            \Illuminate\Support\Facades\Storage::disk('r2')->delete($path);
+        }
     }
 
     /**

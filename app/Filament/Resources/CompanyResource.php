@@ -10,6 +10,8 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Forms\Components\View;
+use Filament\Forms\Components\Checkbox;
 
 class CompanyResource extends Resource
 {
@@ -68,12 +70,22 @@ class CompanyResource extends Resource
                 Forms\Components\Textarea::make('short_v2')
                     ->columnSpanFull()->hidden(),
                 Forms\Components\Toggle::make('needs_checking'),
+                View::make('preview-image')
+                    ->label('Current Logo')
+                    ->visible(fn ($get) => filled($get('cloudinary_url'))),
                 FileUpload::make('cloudinary_url')
                     ->label('Company Logo')
                     ->disk('r2')
                     ->image()
                     ->directory('company-logos')
                     ->visibility('public'),
+                Checkbox::make('remove_logo')
+                    ->label('Remove current logo')
+                    ->afterStateUpdated(function ($state, callable $set) {
+                        if ($state) {
+                            $set('cloudinary_url', null);
+                        }
+                    }),
             ]);
     }
 

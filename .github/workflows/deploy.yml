@@ -20,6 +20,9 @@ jobs:
           composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
           npm install
 
+      - name: Lint all PHP files
+        run: find . -type f -name "*.php" -exec php -l {} \;
+
       - name: Run Pint
         run: vendor/bin/pint
 
@@ -46,6 +49,12 @@ jobs:
           composer install --no-dev --optimize-autoloader
           npm install
           npm run build
+
+      - name: Lint all PHP files
+        run: find . -type f -name "*.php" -exec php -l {} \;
+
+      - name: Check Laravel boots without errors
+        run: php artisan
 
       - name: Deploy public/ to public_html/
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5

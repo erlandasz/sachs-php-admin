@@ -9,6 +9,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Permission\Traits\HasRoles;
+use Spatie\Activitylog\LogOptions;
 
 /**
  * @property int $id
@@ -80,5 +81,10 @@ class User extends Authenticatable implements FilamentUser
     {
         return in_array($this->email, ['erlandasz@gmail.com', 'erlandas@kurtuvenai.lt']) ||
                str_ends_with($this->email, '@sachsforum.com');
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults();
     }
 }

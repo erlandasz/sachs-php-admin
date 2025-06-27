@@ -30,10 +30,22 @@ class PersonObserver
                 );
 
                 $result = $uploader->uploadPersonPhotos($file);
+                Storage::disk('local')->delete($filePath);
                 $person->photo_v2 = $result['large_photo'];
                 $person->photo_small = $result['small_photo'];
                 $person->photo = null;
                 $person->save();
+            }
+        }
+
+        foreach (['photo_v2', 'photo_small'] as $attr) {
+            if ($person->isDirty($attr) && blank($person->$attr)) {
+                $original = $person->getOriginal($attr);
+                if ($original) {
+                    $parsed = parse_url($original);
+                    $path = ltrim($parsed['path'], '/');
+                    \Illuminate\Support\Facades\Storage::disk('r2')->delete($path);
+                }
             }
         }
     }
@@ -61,7 +73,14 @@ class PersonObserver
      */
     public function deleted(Person $person): void
     {
-        //
+        foreach (['photo_v2', 'photo_small'] as $attr) {
+            if ($person->$attr) {
+                $url = $person->$attr;
+                $parsed = parse_url($url);
+                $path = ltrim($parsed['path'], '/');
+                \Illuminate\Support\Facades\Storage::disk('r2')->delete($path);
+            }
+        }
     }
 
     /**

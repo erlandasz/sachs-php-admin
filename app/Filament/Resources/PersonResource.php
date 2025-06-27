@@ -7,6 +7,7 @@ use App\Models\Person;
 use Filament\Forms;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\View;
+use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -32,14 +33,24 @@ class PersonResource extends Resource
                         Forms\Components\TextInput::make('last_name')
                             ->required()
                             ->maxLength(255),
+                        View::make('preview-image')
+                            ->label('Current Photo')
+                            ->visible(fn ($get) => filled($get('photo_v2')) || filled($get('photo_small')) || filled($get('photo'))),
                         FileUpload::make('photo')
                             ->image()
                             ->previewable(true)
-                            ->disk('local') // Store files locally
-                            ->directory('temp/speakers') // Use a temp directory
+                            ->disk('local')
+                            ->directory('temp/speakers')
                             ->default('noPic.png'),
-                        View::make('preview-image')
-                            ->view('filament.forms.components.preview-image'),
+                        Forms\Components\Checkbox::make('remove_photo')
+                            ->label('Remove current photo')
+                            ->afterStateUpdated(function ($state, callable $set) {
+                                if ($state) {
+                                    $set('photo', null);
+                                    $set('photo_v2', null);
+                                    $set('photo_small', null);
+                                }
+                            }),
                         Forms\Components\TextInput::make('photo_small')->maxLength(255)->hidden(),
                         Forms\Components\TextInput::make('photo_v2')->maxLength(255)->hidden(),
                         Forms\Components\Textarea::make('bio')
