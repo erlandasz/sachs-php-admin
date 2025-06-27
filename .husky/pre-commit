@@ -1,6 +1,6 @@
 #!/bin/sh
 
-STAGED_PHP=$(git diff --cached --name-only --diff-filter=ACM | grep '\.php$' | grep -v '^\.vendor/' || true)
+STAGED_PHP=$(git diff --cached --name-only --diff-filter=ACM | grep '\.php$' | grep -v '^\vendor/' || true)
 if [ -n "$STAGED_PHP" ]; then
   echo "$STAGED_PHP" | xargs -n 1 php -l
 fi
