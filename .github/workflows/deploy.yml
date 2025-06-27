@@ -21,7 +21,7 @@ jobs:
           npm install
 
       - name: Lint all PHP files
-        run: find . -type f -name "*.php" -exec php -l {} \;
+        run: find . -type f -name "*.php" ! -path "*/.vendor/*" -exec php -l {} \;
 
       - name: Run Pint
         run: vendor/bin/pint
@@ -51,7 +51,7 @@ jobs:
           npm run build
 
       - name: Lint all PHP files
-        run: find . -type f -name "*.php" -exec php -l {} \;
+        run: find . -type f -name "*.php" ! -path "*/.vendor/*" -exec php -l {} \;
 
       - name: Check Laravel boots without errors
         run: php artisan
