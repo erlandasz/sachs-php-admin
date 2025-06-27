@@ -20,6 +20,7 @@ class CronController extends Controller
     public function attendees(): JsonResponse
     {
         \Log::info('attendees upload started...');
+
         $events = Event::where('show_event', true)->get()->all();
         $results = [];
         foreach ($events as $event) {
@@ -27,7 +28,8 @@ class CronController extends Controller
             $event_slug = $event->slug;
 
             if (! $base_id) {
-                \Log::error('No airtable base! '.$event_slug)
+                \Log::error('No airtable base! '.$event_slug);
+
                 continue;
             }
 
@@ -36,6 +38,7 @@ class CronController extends Controller
 
             } catch (\Exception $e) {
                 \Log::error('Cant access table for '.$event_slug);
+
                 continue;
             }
 

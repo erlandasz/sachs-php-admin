@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Storage;
 
 class PersonObserver
 {
-
     protected AirtableService $airtableService;
 
     public function __construct(AirtableService $airtableService)

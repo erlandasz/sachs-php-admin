@@ -2,16 +2,15 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Imports\PayingCustomerImporter;
 use App\Filament\Resources\PayingCustomerResource\Pages;
 use App\Models\PayingCustomer;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Actions\ImportAction;
-use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Actions\EditAction; // <-- Add this import
+use Filament\Tables\Table;
+
+// <-- Add this import
 
 class PayingCustomerResource extends Resource
 {
