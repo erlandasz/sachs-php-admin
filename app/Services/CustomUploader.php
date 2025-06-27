@@ -13,15 +13,13 @@ class CustomUploader
 
     public function __construct()
     {
-        $this->disk = Storage::disk('r2'); // Make sure 'r2' is defined in config/filesystems.php
+        $this->disk = Storage::disk('r2');
     }
 
     /**
      * Resize and upload an image.
-     *
-     * @return string
      */
-    public function uploadAndResize(UploadedFile $file, string $directory, int $width, int $height)
+    public function uploadAndResize(UploadedFile $file, string $directory, int $width, int $height): string
     {
         $filename = pathinfo($file->hashName(), PATHINFO_FILENAME);
         $newFilename = "{$filename}-{$width}x{$height}.png";
