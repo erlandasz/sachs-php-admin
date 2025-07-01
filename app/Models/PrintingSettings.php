@@ -128,4 +128,9 @@ class PrintingSettings extends Model
             $this->offsetUnset($colorField); // Properly removes from attributes
         }
     }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults();
+    }
 }
