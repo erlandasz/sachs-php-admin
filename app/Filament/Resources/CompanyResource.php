@@ -78,13 +78,6 @@ class CompanyResource extends Resource
                 View::make('preview-image')
                     ->label('Current Logo')
                     ->visible(fn ($get) => filled($get('cloudinary_url'))),
-                // FileUpload::make('cloudinary_url')
-                //     ->label('Company Logo')
-                //     ->disk('r2')
-                //     ->image()
-                //     ->directory('company-logos')
-                //     ->visibility('public'),
-
                 Checkbox::make('remove_logo')
                     ->label('Remove current logo')
                     ->afterStateUpdated(function ($state, callable $set) {

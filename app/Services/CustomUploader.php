@@ -11,13 +11,18 @@ class CustomUploader
 {
     protected $disk;
 
+    protected $publicBaseUrl;
+
     public function __construct()
     {
         $this->disk = Storage::disk('r2');
+        // Set your public R2 base URL here:
+        $this->publicBaseUrl = 'https://pub-b4473a0493b84baea768f8d46eb872a7.r2.dev/';
     }
 
     /**
      * Resize and upload an image.
+     * Returns the public URL.
      */
     public function uploadAndResize(UploadedFile $file, string $directory, int $width, int $height): string
     {
@@ -32,10 +37,10 @@ class CustomUploader
             })
             ->toPng();
 
-        $this->disk->put($path, (string) $image, ['visibility' => 'public']); // Set visibility here
+        $this->disk->put($path, (string) $image, ['visibility' => 'public']);
 
-        return $this->disk->url($path); // Return the full URL
-
+        // Return the full public URL
+        return $this->publicBaseUrl.ltrim($path, '/');
     }
 
     /**
@@ -50,17 +55,15 @@ class CustomUploader
 
     /**
      * Upload a person photo.
-     *
-     * @return string
      */
     public function uploadPersonPhotos(UploadedFile $file): array
     {
-        $largePhotoPath = $this->uploadAndResize($file, 'person-photos', 400, 600);
-        $smallPhotoPath = $this->uploadAndResize($file, 'person-photos', 80, 120);
+        $largePhotoUrl = $this->uploadAndResize($file, 'person-photos', 400, 600);
+        $smallPhotoUrl = $this->uploadAndResize($file, 'person-photos', 80, 120);
 
         return [
-            'large_photo' => $largePhotoPath,
-            'small_photo' => $smallPhotoPath,
+            'large_photo' => $largePhotoUrl,
+            'small_photo' => $smallPhotoUrl,
         ];
     }
 }
