@@ -39,7 +39,7 @@ class PersonResource extends Resource
                             ->image()
                             ->imageEditor()
                             ->imageEditorMode(1)
-                            ->imageEditorAspectRatios(['2:1'])
+                            ->imageEditorAspectRatios(['2:3'])
                             ->imageEditorEmptyFillColor('#FFFFFF')
                             ->previewable(true)
                             ->disk('local')
