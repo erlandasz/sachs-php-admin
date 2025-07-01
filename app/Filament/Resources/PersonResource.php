@@ -37,6 +37,10 @@ class PersonResource extends Resource
                             ->visible(fn ($get) => filled($get('photo_v2')) || filled($get('photo_small')) || filled($get('photo'))),
                         FileUpload::make('photo')
                             ->image()
+                            ->imageEditor()
+                            ->imageEditorMode(0)
+                            ->imageEditorAspectRatios(['2:1'])
+                            ->imageEditorEmptyFillColor('#FFFFFF')
                             ->previewable(true)
                             ->disk('local')
                             ->directory('temp/speakers')

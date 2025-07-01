@@ -41,6 +41,10 @@ class CompanyResource extends Resource
                     ->directory('company-logos')
                     ->visibility('private')
                     ->image()
+                    ->imageEditor()
+                    ->imageEditorMode(0)
+                    ->imageEditorAspectRatios(['2:1'])
+                    ->imageEditorEmptyFillColor('#FFFFFF')
                     ->preserveFilenames(),
                 Forms\Components\TextInput::make('type')
                     ->maxLength(255),
