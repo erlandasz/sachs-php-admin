@@ -3,8 +3,10 @@
 namespace App\Filament\Resources\CompanyResource\Pages;
 
 use App\Filament\Resources\CompanyResource;
+use App\Services\AirtableService;
 use Filament\Actions;
 use Filament\Actions\Action;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
 
 class EditCompany extends EditRecord
@@ -75,5 +77,17 @@ class EditCompany extends EditRecord
             type: 'success',
             message: 'Copied to clipboard!',
         );
+    }
+
+    public function loadFromAirtable(Company $record): void
+    {
+        $airtableService = app()->make(AirtableService::class);
+        $airtableService->loadCompany($record->id);
+
+        Notification::make()
+            ->title('Success')
+            ->body('Data fetched from Airtable!')
+            ->success()
+            ->send();
     }
 }
