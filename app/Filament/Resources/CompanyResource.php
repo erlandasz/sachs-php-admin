@@ -42,9 +42,10 @@ class CompanyResource extends Resource
                     ->visibility('private')
                     ->image()
                     ->imageEditor()
-                    ->imageEditorMode(0)
+                    ->imageEditorMode(1)
                     ->imageEditorAspectRatios(['2:1'])
                     ->imageEditorEmptyFillColor('#FFFFFF')
+                    ->previewable(true)
                     ->preserveFilenames(),
                 Forms\Components\TextInput::make('type')
                     ->maxLength(255),

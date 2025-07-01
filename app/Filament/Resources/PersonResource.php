@@ -38,7 +38,7 @@ class PersonResource extends Resource
                         FileUpload::make('photo')
                             ->image()
                             ->imageEditor()
-                            ->imageEditorMode(0)
+                            ->imageEditorMode(1)
                             ->imageEditorAspectRatios(['2:1'])
                             ->imageEditorEmptyFillColor('#FFFFFF')
                             ->previewable(true)
