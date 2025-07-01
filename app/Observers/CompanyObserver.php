@@ -10,7 +10,7 @@ class CompanyObserver
 {
     public function saving(Company $company): void
     {
-        if ($company->isDirty('photo')) {
+        if ($company->isDirty('logo_name')) {
             $uploader = new CustomUploader;
             $filePath = $company->logo_name;
 
