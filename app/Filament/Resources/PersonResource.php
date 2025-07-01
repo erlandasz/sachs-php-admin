@@ -39,6 +39,8 @@ class PersonResource extends Resource
                             ->image()
                             ->imageEditor()
                             ->imageEditorMode(1)
+                            ->imageEditorViewportWidth(400)
+                            ->imageEditorViewportHeight(600)
                             ->imageEditorAspectRatios(['2:3'])
                             ->imageEditorEmptyFillColor('#FFFFFF')
                             ->previewable(true)
