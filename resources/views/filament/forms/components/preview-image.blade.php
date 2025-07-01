@@ -4,7 +4,7 @@
 @endphp
 
 <img
-    src="{{ $record ? $record->preview_image_url : asset('noPic.png') }}"
+    src="{{ $record ? $record->cloudinary_url : asset('noPic.png') }}"
     alt="Preview"
     style="max-width: 400px; max-height: 600px;"
 />
