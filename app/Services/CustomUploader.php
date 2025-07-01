@@ -4,7 +4,7 @@ namespace App\Services;
 
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use Intervention\Image\Drivers\Gd\Driver as GdDriver;
+use Intervention\Image\Drivers\Gd\Driver;
 use Intervention\Image\ImageManager;
 
 class CustomUploader
@@ -29,15 +29,30 @@ class CustomUploader
         $filename = pathinfo($file->hashName(), PATHINFO_FILENAME);
         $newFilename = "{$filename}-{$width}x{$height}.png";
         $path = $directory.'/'.$newFilename;
-        $manager = new ImageManager(new GdDriver);
+        $manager = new ImageManager(new Driver);
+
+        // Read and resize the image, keeping aspect ratio
         $image = $manager->read($file->getRealPath())
             ->resize($width, $height, function ($constraint) {
                 $constraint->aspectRatio();
                 $constraint->upsize();
-            })
-            ->toPng();
+            });
 
-        $this->disk->put($path, (string) $image, ['visibility' => 'public']);
+        // Create a white canvas
+        $canvas = $manager->create($width, $height, '#ffffff');
+
+        // Calculate position to center the image on the canvas
+        $x = intval(($width - $image->width()) / 2);
+        $y = intval(($height - $image->height()) / 2);
+
+        // Insert the resized image onto the canvas at the calculated position
+        $canvas->place($image, $x, $y);
+
+        // Encode to PNG
+        $finalImage = $canvas->toPng();
+
+        // Save or upload the image
+        $this->disk->put($path, (string) $finalImage, ['visibility' => 'public']);
 
         // Return the full public URL
         return $this->publicBaseUrl.ltrim($path, '/');
