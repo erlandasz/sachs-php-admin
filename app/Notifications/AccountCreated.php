@@ -20,6 +20,7 @@ class AccountCreated extends Notification
             ->subject('Your New Account Details')
             ->line('Your account has been created.')
             ->line('Your temporary password is: '.$this->password)
-            ->line('Please change your password after logging in.');
+            ->line('Please change your password after logging in.')
+            ->action('Go to Admin Panel', 'https://admin.sachsevent.com/admin');
     }
 }
