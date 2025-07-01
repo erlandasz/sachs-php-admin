@@ -35,8 +35,17 @@ class CompanyResource extends Resource
                 Forms\Components\TextInput::make('email')
                     ->email()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('logo_name')
-                    ->maxLength(255),
+                FileUpload::make('logo_name')
+                    ->label('Company Logo')
+                    ->disk('local')
+                    ->directory('company-logos')
+                    ->visibility('private')
+                    ->image()
+                    ->preserveFilenames()
+                    ->storeFileNamesUsing(fn ($file) => 'logo_'.time().'.'.$file->getClientOriginalExtension())
+                    ->imagePreview(function ($record) {
+                        return $record->cloudinary_url;
+                    }),
                 Forms\Components\TextInput::make('type')
                     ->maxLength(255),
                 Forms\Components\TextInput::make('ticker')
@@ -73,12 +82,12 @@ class CompanyResource extends Resource
                 View::make('preview-image')
                     ->label('Current Logo')
                     ->visible(fn ($get) => filled($get('cloudinary_url'))),
-                FileUpload::make('cloudinary_url')
-                    ->label('Company Logo')
-                    ->disk('r2')
-                    ->image()
-                    ->directory('company-logos')
-                    ->visibility('public'),
+                // FileUpload::make('cloudinary_url')
+                //     ->label('Company Logo')
+                //     ->disk('r2')
+                //     ->image()
+                //     ->directory('company-logos')
+                //     ->visibility('public'),
                 Checkbox::make('remove_logo')
                     ->label('Remove current logo')
                     ->afterStateUpdated(function ($state, callable $set) {
