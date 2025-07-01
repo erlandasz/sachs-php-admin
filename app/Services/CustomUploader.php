@@ -32,7 +32,7 @@ class CustomUploader
             })
             ->toPng();
 
-        $this->disk->put($path, (string) $image, 'public'); // Set visibility here
+        $this->disk->put($path, (string) $image, ['visibility' => 'public']); // Set visibility here
 
         return $this->disk->url($path); // Return the full URL
 
