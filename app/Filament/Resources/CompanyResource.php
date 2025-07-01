@@ -7,6 +7,7 @@ use App\Models\Company;
 use Filament\Forms;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Image;
 use Filament\Forms\Components\View;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -41,11 +42,7 @@ class CompanyResource extends Resource
                     ->directory('company-logos')
                     ->visibility('private')
                     ->image()
-                    ->preserveFilenames()
-                    ->storeFileNamesUsing(fn ($file) => 'logo_'.time().'.'.$file->getClientOriginalExtension())
-                    ->imagePreview(function ($record) {
-                        return $record->cloudinary_url;
-                    }),
+                    ->preserveFilenames(),
                 Forms\Components\TextInput::make('type')
                     ->maxLength(255),
                 Forms\Components\TextInput::make('ticker')
@@ -88,6 +85,7 @@ class CompanyResource extends Resource
                 //     ->image()
                 //     ->directory('company-logos')
                 //     ->visibility('public'),
+
                 Checkbox::make('remove_logo')
                     ->label('Remove current logo')
                     ->afterStateUpdated(function ($state, callable $set) {
