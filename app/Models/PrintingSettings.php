@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Orientation;
 use App\PageSize;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 class PrintingSettings extends Model
