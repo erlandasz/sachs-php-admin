@@ -56,6 +56,9 @@ jobs:
       - name: Check Laravel boots without errors
         run: php artisan
 
+      - name: Test php
+        run: php artisan test
+
       - name: Deploy public/ to public_html/
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
