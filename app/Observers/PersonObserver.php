@@ -62,8 +62,14 @@ class PersonObserver
      */
     public function updated(Person $person): void
     {
+
         if ($person->isDirty('airtableId')) {
-            $entry = $this->airtableService->loadSpeaker($person);
+            if ($person->airtableId === '') {
+                $person->airtableId = null;
+                $person->save();
+            } else {
+                $entry = $this->airtableService->loadSpeaker($person);
+            }
         }
     }
 

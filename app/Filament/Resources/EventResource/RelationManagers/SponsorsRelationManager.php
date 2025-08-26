@@ -3,6 +3,8 @@
 namespace App\Filament\Resources\EventResource\RelationManagers;
 
 use App\Models\Company;
+use App\Models\SponsorType;
+use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
@@ -35,7 +37,20 @@ class SponsorsRelationManager extends RelationManager
                     }),
             ])
             ->headerActions([
-                Tables\Actions\AttachAction::make(),
+                Tables\Actions\AttachAction::make()
+                    ->form([
+                        Forms\Components\Select::make('recordId')
+                            ->label('Company')
+                            ->searchable()
+                            ->required()
+                            ->options(function () {
+                                return Company::query()->pluck('name', 'id');
+                            }),
+                        Forms\Components\Select::make('role')
+                            ->label('Sponsor Type')
+                            ->options(SponsorType::query()->pluck('name', 'id'))
+                            ->required(),
+                    ]),
             ])
             ->actions([
                 Tables\Actions\DetachAction::make(),

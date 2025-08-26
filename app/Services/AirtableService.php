@@ -250,7 +250,8 @@ class AirtableService
 
     public function extractProfilePicture(string $imageLink)
     {
-        $imageContent = @file_get_contents($imageLink);
+
+        $imageContent = @file_get_contents($imageLink, false);
 
         return $this->imageService->createImg($imageContent, 400, 600, 'images/people/');
     }
