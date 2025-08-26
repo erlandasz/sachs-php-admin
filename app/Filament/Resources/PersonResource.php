@@ -44,6 +44,7 @@ class PersonResource extends Resource
                             ->imageEditorAspectRatios(['2:3'])
                             ->imageEditorEmptyFillColor('#FFFFFF')
                             ->previewable(true)
+                            ->imagePreviewHeight(200)
                             ->disk('local')
                             ->directory('temp/speakers')
                             ->default('noPic.png'),
