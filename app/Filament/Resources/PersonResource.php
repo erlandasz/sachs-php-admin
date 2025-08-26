@@ -25,7 +25,7 @@ class PersonResource extends Resource
                 Forms\Components\Section::make('Personal Information')
                     ->schema([
                         Forms\Components\TextInput::make('title')
-                            ->maxLength(255),
+                            ->maxLength(255)->required()->default('none'),
                         Forms\Components\TextInput::make('first_name')
                             ->required()
                             ->maxLength(255),
