@@ -120,4 +120,11 @@ class Company extends Model
     {
         return LogOptions::defaults();
     }
+
+    public function events()
+    {
+        return $this->belongsToMany(Event::class, 'event_presenter')
+            ->using(EventPresenter::class)
+            ->withPivot('presenter_type_id');
+    }
 }
