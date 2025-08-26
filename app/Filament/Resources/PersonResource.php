@@ -78,7 +78,9 @@ class PersonResource extends Resource
                         Forms\Components\TextInput::make('job_title')
                             ->required()
                             ->maxLength(255),
-
+                        Forms\Components\TextInput::make('companyName')
+                            ->required()
+                            ->maxLength(255),
                     ])->columns(2),
 
                 Forms\Components\Section::make('System Information')

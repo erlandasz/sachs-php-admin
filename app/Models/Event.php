@@ -207,6 +207,7 @@ class Event extends Model
         'online_virtual_meetings',
         'airtable_base',
         'airtable_name',
+        'timezone',
     ];
 
     /**
