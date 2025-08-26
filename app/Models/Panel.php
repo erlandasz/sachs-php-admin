@@ -67,11 +67,7 @@ class Panel extends Model
     protected $connection = 'mysql_hostinger';
 
     protected $fillable = [
-        'name', 'phone_no', 'website', 'founded', 'email', 'logo_name', 'type',
-        'ticker', 'profile', 'short_profile', 'financial_summary', 'address',
-        'sector', 'airtableId', 'city', 'country', 'zip', 'street', 'state',
-        'airtableLogo', 'nif_airtable_id', 'short_v2', 'needs_checking',
-        'cloudinary_url',
+        'name', 'starts_at', 'ends_at', 'day', 'room', 'type', 'company_id', 'recording_url', 'event_id',
     ];
 
     protected $casts = [

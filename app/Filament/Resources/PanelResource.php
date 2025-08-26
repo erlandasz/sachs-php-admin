@@ -90,7 +90,7 @@ class PanelResource extends Resource
                             $set('day', null); // Reset day if event changes
                         }
                     }),
-                DatePicker::make('starts_at')
+                DatePicker::make('day')
                     ->required()
                     ->disabled(fn (Forms\Get $get) => ! $get('event_id'))
                     ->minDate(function (Forms\Get $get) {
@@ -103,19 +103,7 @@ class PanelResource extends Resource
 
                         return $event?->ends_at;
                     }),
-                DatePicker::make('ends_at')
-                    ->required()
-                    ->disabled(fn (Forms\Get $get) => ! $get('event_id'))
-                    ->minDate(function (Forms\Get $get) {
-                        $event = \App\Models\Event::find($get('event_id'));
 
-                        return $event?->starts_at;
-                    })
-                    ->maxDate(function (Forms\Get $get) {
-                        $event = \App\Models\Event::find($get('event_id'));
-
-                        return $event?->ends_at;
-                    }),
                 Forms\Components\Select::make('track')
                     ->options([
                         'track_a' => 'Track A',
