@@ -60,7 +60,7 @@ class PanelResource extends Resource
                     ->required(),
                 Forms\Components\TimePicker::make('ends_at')
                     ->required()
-                    ->default(now()->format('H:i'))->hidden(),
+                    ->default(now()->format('H:i')),
                 Fieldset::make('Recording')
                     ->relationship('recording_url')
                     ->schema([
