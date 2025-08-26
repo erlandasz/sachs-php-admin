@@ -33,7 +33,7 @@ class PersonObserver
                 $person->photo_v2 = $result['large_photo'];
                 $person->photo_small = $result['small_photo'];
                 $person->photo = null;
-                $person->save();
+                $person->saveQuietly();
             }
         }
 
@@ -66,7 +66,7 @@ class PersonObserver
         if ($person->isDirty('airtableId')) {
             if ($person->airtableId === '') {
                 $person->airtableId = null;
-                $person->save();
+                $person->saveQuietly();
             } else {
                 $entry = $this->airtableService->loadSpeaker($person);
             }

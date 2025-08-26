@@ -7,6 +7,8 @@ use App\Models\Company;
 use App\Models\Person;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Str;
 
 class AirtableService
 {
@@ -231,12 +233,16 @@ class AirtableService
             'last_name' => 'Last Name',
         ];
 
+        if (! $airtableId) {
+            return;
+        }
+
         $airtableEntryFields = $this->getEntry($airtableId);
 
         if (isset($airtableEntryFields['Profile Picture'])) {
             $image = $airtableEntryFields['Profile Picture'];
             if (isset($image) && isset($image[0]) && isset($image[0]['url'])) {
-                $imageName = $this->extractProfilePicture($image[0]['url']);
+                $imageName = $this->extractProfilePicture($image[0]['url'], $person->id);
                 $person->photo = $imageName ?? $this->defaultImageName;
             }
         }
@@ -245,13 +251,34 @@ class AirtableService
             $person->$property = ! empty($airtableEntryFields[$fieldName]) ? str_replace("\n\n", "\n", $airtableEntryFields[$fieldName]) : '-';
         }
 
-        return $person->save();
+        return $person->saveQuietly();
     }
 
-    public function extractProfilePicture(string $imageLink)
+    private function extractProfilePicture(string $imageLink, int $personId)
     {
+        $imageContent = @file_get_contents($imageLink);
 
-        $imageContent = @file_get_contents($imageLink, false);
+        $person = Person::where('id', $personId)->first();
+
+        $tempPath = sys_get_temp_dir().'/'.Str::random(10).'.jpg';
+        file_put_contents($tempPath, $imageContent);
+        $file = new UploadedFile(
+            $tempPath,
+            'profile.jpg',  // original name
+            'image/jpeg',   // mime type, adjust if needed
+            null,
+            true           // mark as test to avoid is_uploaded_file() check
+        );
+        $uploader = new CustomUploader;
+
+        $result = $uploader->uploadPersonPhotos($file);
+
+        $person->photo_v2 = $result['large_photo'];
+        $person->photo_small = $result['small_photo'];
+        $person->photo = null;
+        $person->saveQuietly();
+        \Log::info('DONE');
+        unlink($tempPath);
 
         return $this->imageService->createImg($imageContent, 400, 600, 'images/people/');
     }

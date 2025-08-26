@@ -76,6 +76,9 @@ class CustomUploader
         $largePhotoUrl = $this->uploadAndResize($file, 'person-photos', 400, 600);
         $smallPhotoUrl = $this->uploadAndResize($file, 'person-photos', 80, 120);
 
+        \Log::info($largePhotoUrl);
+        \Log::info($smallPhotoUrl);
+
         return [
             'large_photo' => $largePhotoUrl,
             'small_photo' => $smallPhotoUrl,
