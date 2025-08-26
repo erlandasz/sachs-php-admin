@@ -110,6 +110,7 @@ class Person extends Model
         if ($this->photo_v2) {
             return $this->photo_v2;
         }
+
         if ($this->photo_small) {
             return $this->photo_small;
         }
