@@ -8,6 +8,7 @@ use Filament\Actions;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
+use Webbingbrasil\FilamentCopyActions\Pages\Actions\CopyAction;
 
 class EditCompany extends EditRecord
 {
@@ -16,25 +17,28 @@ class EditCompany extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
-            Action::make('copyWebsite')
-                ->label('Copy Website')
-                ->action(function () {
-                    $website = $this->prepareWebsiteForCopy($this->record->website);
-                    $this->copyToClipboard($website);
-                }),
-            Action::make('copyProfileOrShortProfile')
-                ->label('Copy Profile')
-                ->action(function () {
-                    $copyText = $this->record->short_profile ?? $this->record->profile ?? '';
-                    $this->copyToClipboard($copyText);
-                }),
-            Action::make('copyLogoUrl')
-                ->label('Copy Logo URL')
-                ->action(function () {
-                    $logoUrl = $this->getLogoUrlForCopy();
-                    $this->copyToClipboard($logoUrl);
-                }),
+            // Actions\DeleteAction::make(),
+            // Action::make('copyWebsite')
+            //     ->label('Copy Website')
+            //     ->action(function () {
+            //         $website = $this->prepareWebsiteForCopy($this->record->website);
+            //         $this->copyToClipboard($website);
+            //     }),
+            // Action::make('copyProfileOrShortProfile')
+            //     ->label('Copy Profile')
+            //     ->action(function () {
+            //         $copyText = $this->record->short_profile ?? $this->record->profile ?? '';
+            //         $this->copyToClipboard($copyText);
+            //     }),
+            // Action::make('copyLogoUrl')
+            //     ->label('Copy Logo URL')
+            //     ->action(function () {
+            //         $logoUrl = $this->getLogoUrlForCopy();
+            //         $this->copyToClipboard($logoUrl);
+            //     }),
+            CopyAction::make()->label('website')->copyable(fn () => $this->record->website),
+            CopyAction::make()->label('profile')->copyable(fn () => $this->record->short_profile ?? $this->record->profile ?? ''),
+            CopyAction::make()->label('logo')->copyable(fn () => $this->getLogoUrlForCopy()),
         ];
     }
 
