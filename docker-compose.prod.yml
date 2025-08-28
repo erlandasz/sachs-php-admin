@@ -1,0 +1,116 @@
+version: '3.8'
+
+services:
+  app:
+    image: ghcr.io/${GITHUB_REPOSITORY:-your-username/sachs-admin}:latest
+    container_name: sachs-admin-app
+    restart: unless-stopped
+    environment:
+      - APP_ENV=production
+      - APP_DEBUG=false
+      - DB_CONNECTION=mysql
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=${DB_DATABASE}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - MAIL_MAILER=${MAIL_MAILER}
+      - MAIL_HOST=${MAIL_HOST}
+      - MAIL_PORT=${MAIL_PORT}
+      - MAIL_USERNAME=${MAIL_USERNAME}
+      - MAIL_PASSWORD=${MAIL_PASSWORD}
+      - MAIL_ENCRYPTION=${MAIL_ENCRYPTION}
+      - MAIL_FROM_ADDRESS=${MAIL_FROM_ADDRESS}
+      - MAIL_FROM_NAME=${MAIL_FROM_NAME}
+      - CLOUDINARY_URL=${CLOUDINARY_URL}
+      - SENTRY_LARAVEL_DSN=${SENTRY_LARAVEL_DSN}
+      - AIRTABLE_API_KEY=${AIRTABLE_API_KEY}
+      - AIRTABLE_BASE_ID=${AIRTABLE_BASE_ID}
+    volumes:
+      - app_storage:/var/www/html/storage
+      - app_cache:/var/www/html/bootstrap/cache
+    depends_on:
+      - db
+      - redis
+    networks:
+      - sachs-admin-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  db:
+    image: mysql:8.0
+    container_name: sachs-admin-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d
+    networks:
+      - sachs-admin-network
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  redis:
+    image: redis:7-alpine
+    container_name: sachs-admin-redis
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+    networks:
+      - sachs-admin-network
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  nginx:
+    image: nginx:alpine
+    container_name: sachs-admin-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d
+      - ./public:/var/www/html/public
+      - ./docker/nginx/ssl:/etc/nginx/ssl
+      - nginx_logs:/var/log/nginx
+    depends_on:
+      - app
+    networks:
+      - sachs-admin-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost/nginx_status" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  mysql_data:
+    driver: local
+  redis_data:
+    driver: local
+  app_storage:
+    driver: local
+  app_cache:
+    driver: local
+  nginx_logs:
+    driver: local
+
+networks:
+  sachs-admin-network:
+    driver: bridge

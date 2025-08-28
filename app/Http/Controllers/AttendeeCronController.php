@@ -25,7 +25,7 @@ function setAirtableConfigDynamic($tableName, $baseId)
     Config::set('airtable.tables', $tables);
 }
 
-class CronController extends Controller
+class AttendeeCronController extends Controller
 {
     protected AirtableService $airtableService;
 

@@ -233,8 +233,12 @@ class AirtableService
             'last_name' => 'Last Name',
         ];
 
-        if (! $airtableId) {
+        if (! isset($airtableId)) {
             return;
+        }
+
+        if (! is_string($airtableId)) {
+            dd('$airtableId is not a string: '.print_r($airtableId, true));
         }
 
         $airtableEntryFields = $this->getEntry($airtableId);
