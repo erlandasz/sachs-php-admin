@@ -17,8 +17,8 @@ return [
         ],
         'appkQWTis2m77oluX' => [
             'name' => 'Registrations',
-            'base' => 'appkQWTis2m77oluX'
-        ]
+            'base' => 'appkQWTis2m77oluX',
+        ],
     ],
 
     'typecast' => env('AIRTABLE_TYPECAST', true),

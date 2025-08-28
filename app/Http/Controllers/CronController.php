@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use Airtable;
 use App\Models\Event;
 use App\Services\AirtableService;
-use Illuminate\Support\Facades\Config;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Config;
 use Storage;
-use Airtable;
 
 function setAirtableConfigDynamic($tableName, $baseId)
 {
@@ -51,7 +51,7 @@ class CronController extends Controller
             if (! $base_id) {
                 \Log::error('No airtable base! '.$event_slug);
 
-                $failed_events[] = $event_slug. ' '. 'has no base set';
+                $failed_events[] = $event_slug.' '.'has no base set';
 
                 continue;
             }
@@ -61,7 +61,7 @@ class CronController extends Controller
 
             } catch (\Exception $e) {
                 \Log::error('Cant access table for '.$event_slug);
-                $failed_events[] = $event_slug. ' '. 'cant access table';
+                $failed_events[] = $event_slug.' '.'cant access table';
 
                 continue;
             }
@@ -72,7 +72,7 @@ class CronController extends Controller
 
                     return strpos($companyName, 'Independent') === false;
                 })
-                ->filter(function ($record)  use ($event) {
+                ->filter(function ($record) use ($event) {
                     $events_attending = $record['fields']['Event Attending'] ?? '';
 
                     $parts = explode('-', $event->slug);
@@ -97,7 +97,7 @@ class CronController extends Controller
                     return isset($record['fields']['Should be listed under Investors Attending?'])
                         && $record['fields']['Should be listed under Investors Attending?'] === 'Yes';
                 })
-                ->filter(function ($record)  use ($event) {
+                ->filter(function ($record) use ($event) {
                     $events_attending = $record['fields']['Event Attending'] ?? '';
 
                     $parts = explode('-', $event->slug);
@@ -138,7 +138,7 @@ class CronController extends Controller
 
             $results[$event_slug] = [
                 'investors' => count($investorCompanies),
-                'all_records' => $allCompanies,
+                'all_records' => count($allCompanies),
             ];
         }
 
@@ -147,7 +147,7 @@ class CronController extends Controller
         return response()->json([
             'message' => 'Attendees and Investors uploaded successfully',
             'data' => $results,
-            'erorrs' => $failed_events
+            'erorrs' => $failed_events,
         ]);
     }
 }
