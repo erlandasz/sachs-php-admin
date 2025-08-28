@@ -34,7 +34,9 @@ RUN apk add --no-cache \
     libwebp-dev \
     icu-dev \
     postgresql-dev \
-    sqlite-dev
+    sqlite-dev \
+    autoconf \
+    build-base
 
 # Install PHP extensions
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
@@ -108,7 +110,9 @@ RUN apk add --no-cache \
     libwebp-dev \
     icu-dev \
     postgresql-dev \
-    sqlite-dev
+    sqlite-dev \
+    autoconf \
+    build-base
 
 # Install PHP extensions
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
