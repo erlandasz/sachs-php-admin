@@ -15,6 +15,10 @@ return [
             'name' => 'All Received Profiles',
             'base' => 'appz13BqzoJvDXvvf',
         ],
+        'appkQWTis2m77oluX' => [
+            'name' => 'Registrations',
+            'base' => 'appkQWTis2m77oluX'
+        ]
     ],
 
     'typecast' => env('AIRTABLE_TYPECAST', true),

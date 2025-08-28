@@ -4,9 +4,26 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use App\Services\AirtableService;
+use Illuminate\Support\Facades\Config;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Storage;
+use Airtable;
+
+function setAirtableConfigDynamic($tableName, $baseId)
+{
+    // Get current tables config
+    $tables = Config::get('airtable.tables', []);
+
+    // Add or overwrite a table config dynamically
+    $tables[$tableName] = [
+        'name' => 'Registrations', // or any other friendly name you want for the table
+        'base' => $baseId,
+    ];
+
+    // Set the updated tables config
+    Config::set('airtable.tables', $tables);
+}
 
 class CronController extends Controller
 {
@@ -21,23 +38,30 @@ class CronController extends Controller
     {
         \Log::info('attendees upload started...');
 
+        $failed_events = [];
+
         $events = Event::where('show_event', true)->get()->all();
         $results = [];
         foreach ($events as $event) {
             $base_id = $event->airtable_base;
             $event_slug = $event->slug;
 
+            setAirtableConfigDynamic($event->slug, $base_id);
+
             if (! $base_id) {
                 \Log::error('No airtable base! '.$event_slug);
+
+                $failed_events[] = $event_slug. ' '. 'has no base set';
 
                 continue;
             }
 
             try {
-                $records = Airtable->table($base_id)->where('Status', 'Confirmed')->all();
+                $records = Airtable::table($base_id)->where('Status', 'Confirmed')->all();
 
             } catch (\Exception $e) {
                 \Log::error('Cant access table for '.$event_slug);
+                $failed_events[] = $event_slug. ' '. 'cant access table';
 
                 continue;
             }
@@ -47,6 +71,14 @@ class CronController extends Controller
                     $companyName = $record['fields']['Company Name'] ?? '';
 
                     return strpos($companyName, 'Independent') === false;
+                })
+                ->filter(function ($record)  use ($event) {
+                    $events_attending = $record['fields']['Event Attending'] ?? '';
+
+                    $parts = explode('-', $event->slug);
+                    $secondPart = strtoupper($parts[1]);
+
+                    return stripos($events_attending, $secondPart) !== false || stripos($events_attending, 'Virtual Week') !== false;
                 })
                 ->unique(function ($record) {
                     return $record['fields']['Company Name'];
@@ -64,6 +96,14 @@ class CronController extends Controller
                 ->filter(function ($record) {
                     return isset($record['fields']['Should be listed under Investors Attending?'])
                         && $record['fields']['Should be listed under Investors Attending?'] === 'Yes';
+                })
+                ->filter(function ($record)  use ($event) {
+                    $events_attending = $record['fields']['Event Attending'] ?? '';
+
+                    $parts = explode('-', $event->slug);
+                    $secondPart = strtoupper($parts[1]);
+
+                    return stripos($events_attending, $secondPart) !== false || stripos($events_attending, 'Virtual Week') !== false;
                 })
                 ->unique(function ($record) {
                     return $record['fields']['Company Name'];
@@ -107,6 +147,7 @@ class CronController extends Controller
         return response()->json([
             'message' => 'Attendees and Investors uploaded successfully',
             'data' => $results,
+            'erorrs' => $failed_events
         ]);
     }
 }
