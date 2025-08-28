@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Airtable;
 use App\Models\Company;
 use App\Models\Person;
 use Illuminate\Http\Request;
