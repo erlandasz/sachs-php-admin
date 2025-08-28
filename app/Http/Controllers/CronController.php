@@ -78,7 +78,7 @@ class CronController extends Controller
                     $parts = explode('-', $event->slug);
                     $secondPart = strtoupper($parts[1]);
 
-                    return stripos($events_attending, $secondPart) !== false || stripos($events_attending, 'Virtual Week') !== false;
+                    return stripos($events_attending, $secondPart) !== false;
                 })
                 ->unique(function ($record) {
                     return $record['fields']['Company Name'];
@@ -103,7 +103,7 @@ class CronController extends Controller
                     $parts = explode('-', $event->slug);
                     $secondPart = strtoupper($parts[1]);
 
-                    return stripos($events_attending, $secondPart) !== false || stripos($events_attending, 'Virtual Week') !== false;
+                    return stripos($events_attending, $secondPart) !== false;
                 })
                 ->unique(function ($record) {
                     return $record['fields']['Company Name'];
