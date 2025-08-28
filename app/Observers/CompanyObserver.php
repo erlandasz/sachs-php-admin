@@ -25,7 +25,7 @@ class CompanyObserver
                 Storage::disk('local')->delete($filePath);
                 $company->logo_name = null;
                 $company->cloudinary_url = $result;
-                $company->save();
+                $company->saveQuietly();
             }
         }
 

@@ -12,9 +12,9 @@ class CronController extends Controller
 {
     protected AirtableService $airtableService;
 
-    protected function __construct(AirtableService $airtableService)
+    public function __construct(AirtableService $airtableService)
     {
-        $this->airtableService = $$airtableService;
+        $this->airtableService = $airtableService;
     }
 
     public function attendees(): JsonResponse
@@ -73,8 +73,8 @@ class CronController extends Controller
                 ->all();
 
             // Save attendees CSV
-            $attendeesFilename = $eventSlug.'-attendees.csv';
-            $attendeesPath = 'attendees/'.$eventSlug.'/'.$attendeesFilename;
+            $attendeesFilename = $event_slug.'-attendees.csv';
+            $attendeesPath = 'attendees/'.$event_slug.'/'.$attendeesFilename;
             $csv = fopen('php://temp', 'w');
             foreach ($allCompanies as $company) {
                 fputcsv($csv, [$company]);
@@ -83,8 +83,8 @@ class CronController extends Controller
             Storage::disk('r2')->put($attendeesPath, stream_get_contents($csv));
             fclose($csv);
 
-            $investorsFilename = $eventSlug.'-investors.csv';
-            $investorsPath = 'attendees/'.$eventSlug.'/'.$investorsFilename;
+            $investorsFilename = $event_slug.'-investors.csv';
+            $investorsPath = 'attendees/'.$event_slug.'/'.$investorsFilename;
             $csv = fopen('php://temp', 'w');
             foreach ($investorCompanies as $company) {
                 fputcsv($csv, [$company]);
