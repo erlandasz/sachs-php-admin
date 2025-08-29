@@ -111,8 +111,8 @@ jobs:
           echo "Repository contents:"
           ls -la | head -20
 
-      - name: Deploy to Hetzner
-        uses: appleboy/ssh-action@v1.0.3
+      - name: Upload files to server
+        uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.HETZNER_HOST }}
           username: ${{ secrets.HETZNER_USER }}
@@ -120,6 +120,14 @@ jobs:
           key: ${{ secrets.HETZNER_SSH_KEY }}
           source: "."
           target: "/tmp/sachs-admin-deploy"
+
+      - name: Deploy to Hetzner
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HETZNER_HOST }}
+          username: ${{ secrets.HETZNER_USER }}
+          port: ${{ secrets.HETZNER_PORT }}
+          key: ${{ secrets.HETZNER_SSH_KEY }}
           script: |
             # Set environment variables
             export APP_NAME="sachs-admin"
@@ -159,9 +167,17 @@ jobs:
             NEW_DEPLOY_PATH="$DEPLOY_PATH/releases/$DEPLOY_TIMESTAMP"
             mkdir -p $NEW_DEPLOY_PATH
             
+            # Debug: Check what files were uploaded
+            echo "[$(date +'%Y-%m-%d %H:%M:%S')] Checking uploaded files:" | sudo tee -a $LOG_FILE
+            ls -la /tmp/sachs-admin-deploy/ | sudo tee -a $LOG_FILE
+            
             # Copy application files from uploaded source
             echo "[$(date +'%Y-%m-%d %H:%M:%S')] Copying application files" | sudo tee -a $LOG_FILE
             cp -r /tmp/sachs-admin-deploy/* $NEW_DEPLOY_PATH/
+            
+            # Debug: Check if docker-compose.prod.yml was copied
+            echo "[$(date +'%Y-%m-%d %H:%M:%S')] Checking if docker-compose.prod.yml was copied:" | sudo tee -a $LOG_FILE
+            ls -la $NEW_DEPLOY_PATH/docker-compose.prod.yml 2>/dev/null | sudo tee -a $LOG_FILE || echo "docker-compose.prod.yml not found in deployment directory" | sudo tee -a $LOG_FILE
             
             # Debug: List files in deployment directory
             echo "[$(date +'%Y-%m-%d %H:%M:%S')] Files in deployment directory:" | sudo tee -a $LOG_FILE
