@@ -23,7 +23,7 @@
         "michaeld555/filament-croppie": "^1.0",
         "pxlrbt/filament-spotlight": "^2.0",
         "rawilk/laravel-printing": "^4.1",
-        "rmsramos/activitylog": "^1.0",
+        "rmsramos/activitylog": "^2.0",
         "sentry/sentry-laravel": "^4.15",
         "setasign/fpdf": "^1.8",
         "setasign/fpdi": "^2.6",
