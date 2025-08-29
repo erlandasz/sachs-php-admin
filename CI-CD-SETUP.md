@@ -108,7 +108,7 @@ The deployment includes automatic health checks:
 
 ```bash
 # Check application health
-curl -f http://your-server-ip/health
+curl -f http://your-server-ip/up
 
 # Check nginx status
 curl -f http://your-server-ip/nginx_status

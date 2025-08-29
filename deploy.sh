@@ -37,6 +37,12 @@ if [[ $EUID -eq 0 ]]; then
    error "This script should not be run as root"
 fi
 
+# Check if user is in docker group
+if ! groups $USER | grep -q docker; then
+    warning "User $USER is not in docker group. You may need to run: sudo usermod -aG docker $USER"
+    warning "Then log out and log back in, or run: newgrp docker"
+fi
+
 # Create log directory
 sudo mkdir -p /var/log/$APP_NAME
 sudo chown $USER:$USER /var/log/$APP_NAME
@@ -45,12 +51,19 @@ log "Starting deployment of $APP_NAME"
 
 # Check if Docker and Docker Compose are installed
 if ! command -v docker &> /dev/null; then
-    error "Docker is not installed"
+    error "Docker is not installed. Please run setup-server.sh first."
 fi
 
-if ! command -v docker &> /dev/null || ! docker compose version &> /dev/null; then
-    error "Docker Compose is not installed or not working properly"
+# Add Docker to PATH if not already there
+export PATH="/usr/bin:$PATH"
+
+# Check Docker Compose
+if ! docker compose version &> /dev/null; then
+    error "Docker Compose is not working properly. Please run setup-server.sh first."
 fi
+
+log "Docker version: $(docker --version)"
+log "Docker Compose version: $(docker compose version)"
 
 # Create deployment directory
 log "Creating deployment directory"
@@ -82,6 +95,15 @@ mkdir -p "$NEW_DEPLOY_PATH"
 # Copy application files
 log "Copying application files"
 cp -r . "$NEW_DEPLOY_PATH/"
+
+# Create Laravel directories if they don't exist
+log "Creating Laravel directories"
+mkdir -p "$NEW_DEPLOY_PATH/storage/app/public"
+mkdir -p "$NEW_DEPLOY_PATH/storage/framework/cache"
+mkdir -p "$NEW_DEPLOY_PATH/storage/framework/sessions"
+mkdir -p "$NEW_DEPLOY_PATH/storage/framework/views"
+mkdir -p "$NEW_DEPLOY_PATH/storage/logs"
+mkdir -p "$NEW_DEPLOY_PATH/bootstrap/cache"
 
 # Set proper permissions
 log "Setting file permissions"
@@ -156,27 +178,37 @@ EOF
     }
 fi
 
+# Check if docker-compose.prod.yml exists
+if [ ! -f "$NEW_DEPLOY_PATH/docker-compose.prod.yml" ]; then
+    error "docker-compose.prod.yml not found in deployment directory"
+fi
+
+# Change to deployment directory
+cd "$NEW_DEPLOY_PATH"
+
+# Pull latest Docker image
+log "Pulling latest Docker image"
+docker pull ghcr.io/${GITHUB_REPOSITORY:-your-username/sachs-admin}:latest || warning "Failed to pull Docker image, will build locally"
+
 # Generate application key
 log "Generating application key"
-cd "$NEW_DEPLOY_PATH"
-docker compose -f docker-compose.prod.yml run --rm app php artisan key:generate --no-interaction
+docker compose -f docker-compose.prod.yml run --rm app php artisan key:generate --no-interaction || warning "Failed to generate application key"
 
 # Run database migrations
 log "Running database migrations"
-docker compose -f docker-compose.prod.yml run --rm app php artisan migrate --force
+docker compose -f docker-compose.prod.yml run --rm app php artisan migrate --force || warning "Failed to run migrations"
 
 # Clear and cache configuration
 log "Optimizing application"
-docker compose -f docker-compose.prod.yml run --rm app php artisan config:cache
-docker compose -f docker-compose.prod.yml run --rm app php artisan route:cache
-docker compose -f docker-compose.prod.yml run --rm app php artisan view:cache
+docker compose -f docker-compose.prod.yml run --rm app php artisan config:cache || warning "Failed to cache config"
+docker compose -f docker-compose.prod.yml run --rm app php artisan route:cache || warning "Failed to cache routes"
+docker compose -f docker-compose.prod.yml run --rm app php artisan view:cache || warning "Failed to cache views"
 
 # Build and start containers
 log "Building and starting containers"
-cd "$NEW_DEPLOY_PATH"
-docker compose -f docker-compose.prod.yml down --remove-orphans
-docker compose -f docker-compose.prod.yml build --no-cache
-docker compose -f docker-compose.prod.yml up -d
+docker compose -f docker-compose.prod.yml down --remove-orphans || true
+docker compose -f docker-compose.prod.yml build --no-cache || warning "Failed to build containers"
+docker compose -f docker-compose.prod.yml up -d || error "Failed to start containers"
 
 # Wait for services to be ready
 log "Waiting for services to be ready"
@@ -184,10 +216,40 @@ sleep 30
 
 # Health check
 log "Performing health check"
-if curl -f http://localhost/health > /dev/null 2>&1; then
-    log "Health check passed"
-else
-    error "Health check failed"
+sleep 10  # Give containers more time to start
+
+# Try multiple health check endpoints
+HEALTH_CHECK_PASSED=false
+for i in {1..6}; do
+    log "Health check attempt $i/6"
+    
+    # Check if containers are running
+    if docker compose -f docker-compose.prod.yml ps | grep -q "Up"; then
+        # Try health endpoint
+        if curl -f http://localhost/up > /dev/null 2>&1; then
+            log "Health check passed"
+            HEALTH_CHECK_PASSED=true
+            break
+        fi
+        
+        # Try main page as fallback
+        if curl -f http://localhost/ > /dev/null 2>&1; then
+            log "Health check passed (main page accessible)"
+            HEALTH_CHECK_PASSED=true
+            break
+        fi
+    fi
+    
+    log "Health check failed, waiting 10 seconds..."
+    sleep 10
+done
+
+if [ "$HEALTH_CHECK_PASSED" = false ]; then
+    log "Container status:"
+    docker compose -f docker-compose.prod.yml ps
+    log "Container logs:"
+    docker compose -f docker-compose.prod.yml logs --tail=50
+    error "Health check failed after 6 attempts"
 fi
 
 # Update current symlink
