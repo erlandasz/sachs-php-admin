@@ -118,6 +118,8 @@ jobs:
           username: ${{ secrets.HETZNER_USER }}
           port: ${{ secrets.HETZNER_PORT }}
           key: ${{ secrets.HETZNER_SSH_KEY }}
+          source: "."
+          target: "/tmp/sachs-admin-deploy"
           script: |
             # Set environment variables
             export APP_NAME="sachs-admin"
@@ -157,9 +159,9 @@ jobs:
             NEW_DEPLOY_PATH="$DEPLOY_PATH/releases/$DEPLOY_TIMESTAMP"
             mkdir -p $NEW_DEPLOY_PATH
             
-            # Copy application files
+            # Copy application files from uploaded source
             echo "[$(date +'%Y-%m-%d %H:%M:%S')] Copying application files" | sudo tee -a $LOG_FILE
-            cp -r . $NEW_DEPLOY_PATH/
+            cp -r /tmp/sachs-admin-deploy/* $NEW_DEPLOY_PATH/
             
             # Debug: List files in deployment directory
             echo "[$(date +'%Y-%m-%d %H:%M:%S')] Files in deployment directory:" | sudo tee -a $LOG_FILE
@@ -349,5 +351,9 @@ jobs:
             # Show container status
             echo "[$(date +'%Y-%m-%d %H:%M:%S')] Container status:" | sudo tee -a $LOG_FILE
             docker compose -f $DEPLOY_PATH/current/docker-compose.prod.yml ps | sudo tee -a $LOG_FILE
+            
+            # Clean up temporary files
+            echo "[$(date +'%Y-%m-%d %H:%M:%S')] Cleaning up temporary files" | sudo tee -a $LOG_FILE
+            rm -rf /tmp/sachs-admin-deploy
 
  
