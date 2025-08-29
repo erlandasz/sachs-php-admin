@@ -1,172 +1,47 @@
-# name: Deploy to Hetzner
-# on:
-#   push:
-#     branches: [main]
-#   workflow_dispatch:
+name: Deploy Laravel App to Hetzner
 
-# env:
-#   REGISTRY: ghcr.io
-#   IMAGE_NAME: ${{ github.repository }}
+on:
+  push:
+    branches:
+      - main
 
-# jobs:
-#   build-and-push:
-#     runs-on: ubuntu-latest
-#     permissions:
-#       contents: read
-#       packages: write
-#     steps:
-#       - name: Checkout code
-#         uses: actions/checkout@v4
+jobs:
+  build_and_push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+      - uses: actions/setup-php@v2
+        with:
+          php-version: '8.2'
+      - name: Run tests
+        run: |
+          composer install --no-interaction --prefer-dist --optimize-autoloader
+          php artisan test
+          yarn install
+          yarn test
+      - name: Build and push Docker images
+        uses: docker/build-push-action@v3
+        with:
+          push: true
+          tags: ghcr.io/${{ github.repository }}:latest
 
-#       - name: Set up Docker Buildx
-#         uses: docker/setup-buildx-action@v3
-
-#       - name: Log in to Container Registry
-#         uses: docker/login-action@v3
-#         with:
-#           registry: ${{ env.REGISTRY }}
-#           username: ${{ github.actor }}
-#           password: ${{ secrets.GITHUB_TOKEN }}
-
-#       - name: Extract metadata
-#         id: meta
-#         uses: docker/metadata-action@v5
-#         with:
-#           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }},${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-nginx
-#           tags: |
-#             type=ref,event=branch
-#             type=ref,event=pr
-#             type=sha,prefix={{branch}}-
-#             type=raw,value=latest,enable={{is_default_branch}}
-
-#       - name: Build and push app image
-#         uses: docker/build-push-action@v5
-#         with:
-#           context: .
-#           file: ./Dockerfile
-#           target: production
-#           push: true
-#           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest,${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
-#           labels: ${{ steps.meta.outputs.labels }}
-#           cache-from: type=gha
-#           cache-to: type=gha,mode=max
-
-#       - name: Build and push nginx image
-#         uses: docker/build-push-action@v5
-#         with:
-#           context: ./docker/nginx
-#           file: ./docker/nginx/Dockerfile
-#           push: true
-#           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-nginx:latest,${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-nginx:${{ github.sha }}
-#           labels: ${{ steps.meta.outputs.labels }}
-#           cache-from: type=gha
-#           cache-to: type=gha,mode=max
-
-#   deploy:
-#     runs-on: ubuntu-latest
-#     needs: [build-and-push]
-#     environment: production
-#     steps:
-#       - name: Deploy to Hetzner server
-#         uses: appleboy/ssh-action@v1.0.3
-#         with:
-#           host: ${{ secrets.HETZNER_HOST }}
-#           username: ${{ secrets.HETZNER_USER }}
-#           port: ${{ secrets.HETZNER_PORT }}
-#           key: ${{ secrets.HETZNER_SSH_KEY }}
-#           script: |
-#             export APP_NAME="sachs-admin"
-#             export DEPLOY_PATH="/var/www/$APP_NAME"
-#             export BACKUP_PATH="/var/backups/$APP_NAME"
-#             export LOG_FILE="/var/log/$APP_NAME/deploy.log"
-#             export APP_IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest"
-#             export NGINX_IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-nginx:latest"
-
-#             # Create directories and set ownership
-#             sudo mkdir -p $DEPLOY_PATH $BACKUP_PATH /var/log/$APP_NAME
-#             sudo chown ${{ secrets.HETZNER_USER }}:${{ secrets.HETZNER_USER }} $DEPLOY_PATH $BACKUP_PATH /var/log/$APP_NAME
-
-#             echo "[$(date +'%Y-%m-%d %H:%M:%S')] Starting deployment..." | sudo tee -a $LOG_FILE
-
-#             # Backup current deployment (optional)
-#             if [ -d "$DEPLOY_PATH/current" ]; then
-#               BACKUP_NAME="backup-$(date +%Y%m%d-%H%M%S)"
-#               cp -r $DEPLOY_PATH/current $BACKUP_PATH/$BACKUP_NAME
-#               # Keep only last 5 backups
-#               cd $BACKUP_PATH
-#               ls -t | tail -n +6 | xargs -r rm -rf
-#             fi
-
-#             # Pull latest images
-#             echo "[$(date +'%Y-%m-%d %H:%M:%S')] Pulling latest images..." | sudo tee -a $LOG_FILE
-#             docker login ghcr.io -u ${{ github.actor }} --password-stdin <<< ${{ secrets.GITHUB_TOKEN }}
-#             docker pull $APP_IMAGE
-#             docker pull $NGINX_IMAGE
-
-#             # Stop and remove existing containers
-#             echo "[$(date +'%Y-%m-%d %H:%M:%S')] Stopping existing containers..." | sudo tee -a $LOG_FILE
-#             docker rm -f sachs-admin-nginx sachs-admin-app sachs-admin-db sachs-admin-redis 2>/dev/null || true
-#             docker network create sachs-admin-network 2>/dev/null || true
-
-#             # Start containers
-#             echo "[$(date +'%Y-%m-%d %H:%M:%S')] Starting containers..." | sudo tee -a $LOG_FILE
-
-#             # Start MySQL container
-#             docker run -d --name sachs-admin-db \
-#               --network sachs-admin-network \
-#               -e MYSQL_DATABASE=${DB_DATABASE} \
-#               -e MYSQL_USER=${DB_USERNAME} \
-#               -e MYSQL_PASSWORD=${DB_PASSWORD} \
-#               -e MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD} \
-#               -v mysql_data:/var/lib/mysql \
-#               mysql:8.0
-
-#             # Start Redis container
-#             docker run -d --name sachs-admin-redis \
-#               --network sachs-admin-network \
-#               -v redis_data:/data \
-#               redis:7-alpine
-
-#             # Start app container
-#             docker run -d --name sachs-admin-app \
-#               --network sachs-admin-network \
-#               -e APP_ENV=production \
-#               -e APP_DEBUG=false \
-#               -e DB_CONNECTION=mysql \
-#               -e DB_HOST=db \
-#               -e DB_PORT=3306 \
-#               -e DB_DATABASE=${DB_DATABASE} \
-#               -e DB_USERNAME=${DB_USERNAME} \
-#               -e DB_PASSWORD=${DB_PASSWORD} \
-#               -e REDIS_HOST=redis \
-#               -e REDIS_PORT=6379 \
-#               -e MAIL_MAILER=${MAIL_MAILER} \
-#               -e MAIL_HOST=${MAIL_HOST} \
-#               -e MAIL_PORT=${MAIL_PORT} \
-#               -e MAIL_USERNAME=${MAIL_USERNAME} \
-#               -e MAIL_PASSWORD=${MAIL_PASSWORD} \
-#               -e MAIL_ENCRYPTION=${MAIL_ENCRYPTION} \
-#               -e MAIL_FROM_ADDRESS=${MAIL_FROM_ADDRESS} \
-#               -e MAIL_FROM_NAME=${MAIL_FROM_NAME} \
-#               -e CLOUDINARY_URL=${CLOUDINARY_URL} \
-#               -e SENTRY_LARAVEL_DSN=${SENTRY_LARAVEL_DSN} \
-#               -e AIRTABLE_API_KEY=${AIRTABLE_API_KEY} \
-#               -e AIRTABLE_BASE_ID=${AIRTABLE_BASE_ID} \
-#               -v app_storage:/var/www/html/storage \
-#               -v app_cache:/var/www/html/bootstrap/cache \
-#               $APP_IMAGE
-
-#             # Start nginx container
-#             docker run -d --name sachs-admin-nginx \
-#               --network sachs-admin-network \
-#               -p 80:80 -p 443:443 \
-#               -v nginx_logs:/var/log/nginx \
-#               $NGINX_IMAGE
-
-#             # Run migrations and caches
-#             docker exec sachs-admin-app php artisan migrate --force
-#             docker exec sachs-admin-app php artisan config:cache
-#             docker exec sachs-admin-app php artisan route:cache
-#             docker exec sachs-admin-app php artisan view:cache
-
-#             echo "[$(date +'%Y-%m-%d %H:%M:%S')] Deployment completed." | sudo tee -a $LOG_FILE
+  deploy:
+    needs: build_and_push
+    runs-on: ubuntu-latest
+    steps:
+    - name: SSH and Deploy to Hetzner Server
+      uses: appleboy/ssh-action@v0.1.7
+      with:
+        host: ${{ secrets.HETZNER_HOST }}
+        username: ${{ secrets.HETZNER_USER }}
+        port: ${{ secrets.HETZNER_PORT }}
+        key: ${{ secrets.HETZNER_SSH_KEY }}
+        script: |
+          cd /home/erlandas/app
+          docker compose pull
+          docker compose up -d
+          docker compose exec app php artisan migrate --force
+          docker compose exec app php artisan db:seed --force

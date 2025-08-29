@@ -1,165 +1,55 @@
-# Multi-stage build for Laravel application
+# Stage 1: Build frontend assets
 FROM node:20-alpine AS node-builder
-
 WORKDIR /app
-
-# Copy package files
-COPY package*.json ./
-COPY yarn.lock ./
-
-# Install Node.js dependencies
+COPY package*.json yarn.lock ./
 RUN yarn install --frozen-lockfile
-
-# Copy source files
 COPY . .
-
-# Build frontend assets
 RUN yarn build
 
-# PHP stage
+# Stage 2: Build PHP application with dependencies and assets
 FROM php:8.2-fpm-alpine AS php-base
-
-# Install system dependencies
 RUN apk add --no-cache \
-    git \
-    curl \
-    libpng-dev \
-    libxml2-dev \
-    zip \
-    unzip \
-    oniguruma-dev \
-    libzip-dev \
-    freetype-dev \
-    libjpeg-turbo-dev \
-    libwebp-dev \
-    icu-dev \
-    postgresql-dev \
-    sqlite-dev \
-    autoconf \
-    build-base
+    git curl libpng-dev libxml2-dev zip unzip oniguruma-dev libzip-dev freetype-dev libjpeg-turbo-dev libwebp-dev icu-dev \
+    postgresql-dev sqlite-dev autoconf build-base \
+    nginx supervisor
 
 # Install PHP extensions
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
-    && docker-php-ext-install \
-    pdo \
-    pdo_mysql \
-    pdo_pgsql \
-    pdo_sqlite \
-    mbstring \
-    exif \
-    pcntl \
-    bcmath \
-    gd \
-    zip \
-    intl \
-    opcache
-
-# Install Redis extension
-RUN pecl install redis && docker-php-ext-enable redis
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp && \
+    docker-php-ext-install pdo pdo_mysql pdo_pgsql pdo_sqlite mbstring exif pcntl bcmath gd zip intl opcache && \
+    pecl install redis && docker-php-ext-enable redis
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Set working directory
 WORKDIR /var/www/html
-
-# Copy composer files
 COPY composer*.json ./
-
-# Install PHP dependencies (without running artisan commands)
 RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
 
-# Copy application files
 COPY . .
-
-# Run artisan commands after files are copied
 RUN composer run-script post-autoload-dump
 
-# Copy built assets from node-builder stage
+# Copy built frontend assets from node-builder stage
 COPY --from=node-builder /app/public/build ./public/build
 
 # Set permissions
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html/storage \
-    && chmod -R 755 /var/www/html/bootstrap/cache
+RUN chown -R www-data:www-data /var/www/html && \
+    chmod -R 755 storage bootstrap/cache
 
-# Create .env file if it doesn't exist
-RUN if [ ! -f .env ]; then cp .env.example .env 2>/dev/null || echo "APP_NAME=Laravel" > .env; fi
-
-# Generate application key
+# Prepare environment and cache config
+RUN cp .env.example .env || echo "APP_NAME=Laravel" > .env
 RUN php artisan key:generate --no-interaction || true
+RUN php artisan config:cache && php artisan route:cache && php artisan view:cache
 
-# Optimize for production
-RUN php artisan config:cache \
-    && php artisan route:cache \
-    && php artisan view:cache
-
-# Production stage
-FROM php:8.2-fpm-alpine AS production
-
-# Install system dependencies
-RUN apk add --no-cache \
-    nginx \
-    supervisor \
-    curl \
-    libpng-dev \
-    libxml2-dev \
-    zip \
-    unzip \
-    oniguruma-dev \
-    libzip-dev \
-    freetype-dev \
-    libjpeg-turbo-dev \
-    libwebp-dev \
-    icu-dev \
-    postgresql-dev \
-    sqlite-dev \
-    autoconf \
-    build-base
-
-# Install PHP extensions
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
-    && docker-php-ext-install \
-    pdo \
-    pdo_mysql \
-    pdo_pgsql \
-    pdo_sqlite \
-    mbstring \
-    exif \
-    pcntl \
-    bcmath \
-    gd \
-    zip \
-    intl \
-    opcache
-
-# Install Redis extension
-RUN pecl install redis && docker-php-ext-enable redis
-
-# Install Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-
-# Set working directory
-WORKDIR /var/www/html
-
-# Copy application from php-base stage
-COPY --from=php-base /var/www/html .
-
-# Copy configuration files
+# Copy configuration files for nginx, supervisord, and php.ini
 COPY docker/nginx.conf /etc/nginx/nginx.conf
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY docker/php.ini /usr/local/etc/php/conf.d/custom.ini
 
-# Create necessary directories
-RUN mkdir -p /var/log/nginx /var/log/supervisor /run/nginx
+# Create necessary runtime directories and set permissions
+RUN mkdir -p /var/log/nginx /var/log/supervisor /run/nginx && \
+    chown -R www-data:www-data /var/www/html
 
-# Set permissions
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html/storage \
-    && chmod -R 755 /var/www/html/bootstrap/cache
-
-# Expose port
 EXPOSE 80
 
-# Start supervisor
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"] 
+# Start supervisord to manage nginx and php-fpm
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]

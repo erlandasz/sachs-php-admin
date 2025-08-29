@@ -45,9 +45,6 @@ class SpeakerCronController extends Controller
             $event_slug = $event->slug;
             $created = 0;
             $updated = 0;
-
-            setAirtableConfigDynamic($event->slug, $base_id);
-
             if (! $base_id) {
                 \Log::error('No airtable base! '.$event_slug);
 
@@ -55,6 +52,7 @@ class SpeakerCronController extends Controller
 
                 continue;
             }
+            setAirtableConfigDynamic($event->slug, $base_id);
 
             try {
                 $records = Airtable::table($base_id)->where('Status', 'Confirmed')->all();
