@@ -121,10 +121,10 @@ curl -f http://your-server-ip/nginx_status
 ssh deploy@your-server-ip
 
 # Check container status
-docker-compose -f /var/www/sachs-admin/current/docker-compose.prod.yml ps
+docker compose -f /var/www/sachs-admin/current/docker-compose.prod.yml ps
 
 # View logs
-docker-compose -f /var/www/sachs-admin/current/docker-compose.prod.yml logs app
+docker compose -f /var/www/sachs-admin/current/docker-compose.prod.yml logs app
 ```
 
 ## Workflow Details
@@ -189,13 +189,13 @@ AIRTABLE_BASE_ID=${AIRTABLE_BASE_ID}
 sudo tail -f /var/log/sachs-admin/deploy.log
 
 # Application logs
-docker-compose -f /var/www/sachs-admin/current/docker-compose.prod.yml logs app
+docker compose -f /var/www/sachs-admin/current/docker-compose.prod.yml logs app
 
 # Nginx logs
-docker-compose -f /var/www/sachs-admin/current/docker-compose.prod.yml logs nginx
+docker compose -f /var/www/sachs-admin/current/docker-compose.prod.yml logs nginx
 
 # Database logs
-docker-compose -f /var/www/sachs-admin/current/docker-compose.prod.yml logs db
+docker compose -f /var/www/sachs-admin/current/docker-compose.prod.yml logs db
 ```
 
 ### Common Issues
@@ -235,7 +235,7 @@ ls -la /var/backups/sachs-admin/
 sudo cp -r /var/backups/sachs-admin/backup-YYYYMMDD-HHMMSS /var/www/sachs-admin/current
 sudo chown -R deploy:deploy /var/www/sachs-admin/current
 cd /var/www/sachs-admin/current
-docker-compose -f docker-compose.prod.yml up -d
+docker compose -f docker-compose.prod.yml up -d
 ```
 
 ## Security Considerations

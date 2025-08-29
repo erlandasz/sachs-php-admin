@@ -48,8 +48,8 @@ if ! command -v docker &> /dev/null; then
     error "Docker is not installed"
 fi
 
-if ! command -v docker-compose &> /dev/null; then
-    error "Docker Compose is not installed"
+if ! command -v docker &> /dev/null || ! docker compose version &> /dev/null; then
+    error "Docker Compose is not installed or not working properly"
 fi
 
 # Create deployment directory
@@ -159,24 +159,24 @@ fi
 # Generate application key
 log "Generating application key"
 cd "$NEW_DEPLOY_PATH"
-docker-compose -f docker-compose.prod.yml run --rm app php artisan key:generate --no-interaction
+docker compose -f docker-compose.prod.yml run --rm app php artisan key:generate --no-interaction
 
 # Run database migrations
 log "Running database migrations"
-docker-compose -f docker-compose.prod.yml run --rm app php artisan migrate --force
+docker compose -f docker-compose.prod.yml run --rm app php artisan migrate --force
 
 # Clear and cache configuration
 log "Optimizing application"
-docker-compose -f docker-compose.prod.yml run --rm app php artisan config:cache
-docker-compose -f docker-compose.prod.yml run --rm app php artisan route:cache
-docker-compose -f docker-compose.prod.yml run --rm app php artisan view:cache
+docker compose -f docker-compose.prod.yml run --rm app php artisan config:cache
+docker compose -f docker-compose.prod.yml run --rm app php artisan route:cache
+docker compose -f docker-compose.prod.yml run --rm app php artisan view:cache
 
 # Build and start containers
 log "Building and starting containers"
 cd "$NEW_DEPLOY_PATH"
-docker-compose -f docker-compose.prod.yml down --remove-orphans
-docker-compose -f docker-compose.prod.yml build --no-cache
-docker-compose -f docker-compose.prod.yml up -d
+docker compose -f docker-compose.prod.yml down --remove-orphans
+docker compose -f docker-compose.prod.yml build --no-cache
+docker compose -f docker-compose.prod.yml up -d
 
 # Wait for services to be ready
 log "Waiting for services to be ready"
@@ -209,4 +209,4 @@ log "Application is available at: http://$(hostname -I | awk '{print $1}')"
 
 # Show container status
 log "Container status:"
-docker-compose -f "$DEPLOY_PATH/current/docker-compose.prod.yml" ps 
+docker compose -f "$DEPLOY_PATH/current/docker-compose.prod.yml" ps 

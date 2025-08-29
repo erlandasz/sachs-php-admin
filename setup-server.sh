@@ -68,10 +68,9 @@ echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docke
 apt update
 apt install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
 
-# Install Docker Compose
-log "Installing Docker Compose"
-curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-chmod +x /usr/local/bin/docker-compose
+# Create docker-compose symlink for compatibility
+log "Setting up Docker Compose compatibility"
+ln -sf /usr/libexec/docker/cli-plugins/docker-compose /usr/local/bin/docker-compose
 
 # Create deploy user
 log "Creating deploy user"
@@ -229,9 +228,9 @@ DEPLOY_PATH="/var/www/$APP_NAME"
 # Check if containers are running
 if [ -d "$DEPLOY_PATH/current" ]; then
     cd "$DEPLOY_PATH/current"
-    if ! docker-compose -f docker-compose.prod.yml ps | grep -q "Up"; then
+    if ! docker compose -f docker-compose.prod.yml ps | grep -q "Up"; then
         echo "$(date): Containers are down, restarting..." >> /var/log/$APP_NAME/monitor.log
-        docker-compose -f docker-compose.prod.yml up -d
+        docker compose -f docker-compose.prod.yml up -d
     fi
 fi
 
@@ -268,7 +267,7 @@ if [ -d "$DEPLOY_PATH/current" ]; then
     
     # Backup database
     cd "$DEPLOY_PATH/current"
-    docker-compose -f docker-compose.prod.yml exec -T db mysqldump -u root -p"$MYSQL_ROOT_PASSWORD" sachs_admin > "$BACKUP_PATH/db-$DATE.sql"
+    docker compose -f docker-compose.prod.yml exec -T db mysqldump -u root -p"$MYSQL_ROOT_PASSWORD" sachs_admin > "$BACKUP_PATH/db-$DATE.sql"
     
     # Keep only last 7 backups
     cd "$BACKUP_PATH"
