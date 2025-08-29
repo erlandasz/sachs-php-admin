@@ -38,8 +38,16 @@ class CustomUploader
                 $constraint->upsize();
             });
 
-        // Encode to PNG
-        $finalImage = $image->toPng();
+        // Create a canvas with the target dimensions and white background
+        $canvas = $manager->create($width, $height, '#ffffff');
+        // Calculate position to center the resized image on the canvas
+        $x = intval(($width - $image->width()) / 2);
+        $y = intval(($height - $image->height()) / 2);
+        // Place the resized image onto the canvas
+        $canvas->place($image, $x, $y);
+
+        // Encode the **canvas** (not the resized image) to PNG
+        $finalImage = $canvas->toPng();
 
         // Save or upload the image
         $this->disk->put($path, (string) $finalImage, ['visibility' => 'public']);
