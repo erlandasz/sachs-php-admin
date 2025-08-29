@@ -303,7 +303,13 @@ jobs:
             
             # Build and start containers
             echo "[$(date +'%Y-%m-%d %H:%M:%S')] Building and starting containers" | sudo tee -a $LOG_FILE
-            docker compose -f docker-compose.prod.yml down --remove-orphans || true
+            
+            # Force remove any existing containers with the same names
+            echo "[$(date +'%Y-%m-%d %H:%M:%S')] Cleaning up existing containers" | sudo tee -a $LOG_FILE
+            docker compose -f docker-compose.prod.yml down --remove-orphans --volumes || true
+            docker rm -f sachs-admin-app sachs-admin-db sachs-admin-redis sachs-admin-nginx 2>/dev/null || true
+            
+            # Start containers
             docker compose -f docker-compose.prod.yml up -d
             
             # Wait for services to be ready
