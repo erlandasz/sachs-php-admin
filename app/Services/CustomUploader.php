@@ -24,27 +24,20 @@ class CustomUploader
      * Resize and upload an image.
      * Returns the public URL.
      */
-    public function uploadAndResize(UploadedFile $file, string $directory, int $maxWidth, int $maxHeight): string
+    public function uploadAndResize(UploadedFile $file, string $directory, int $maxWidth = 400, int $maxHeight = 600): string
     {
         $filename = pathinfo($file->hashName(), PATHINFO_FILENAME);
         $newFilename = "{$filename}-{$maxWidth}x{$maxHeight}.png";
         $path = $directory.'/'.$newFilename;
+
         $manager = new ImageManager(new Driver);
 
-        // Resize: maxWidth and maxHeight are upper limits, will not stretch
         $image = $manager->read($file->getRealPath())
-            ->resize($maxWidth, $maxHeight, function ($constraint) {
-                $constraint->aspectRatio();
-                $constraint->upsize();
-            });
+            ->cover($maxWidth, $maxHeight); // maintains aspect ratio and crops center
 
-        // Encode result (output is only as big as needed, no canvas)
         $finalImage = $image->toPng();
-
-        // Save or upload the image
         $this->disk->put($path, (string) $finalImage, ['visibility' => 'public']);
 
-        // Return the full public URL
         return $this->publicBaseUrl.ltrim($path, '/');
     }
 
