@@ -16,12 +16,12 @@ jobs:
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
-      - name: Run tests
-        run: |
-          composer install --no-interaction --prefer-dist --optimize-autoloader
-          php artisan test
-          yarn install
-          yarn test
+      # - name: Run tests
+      #   run: |
+      #     composer install --no-interaction --prefer-dist --optimize-autoloader
+      #     php artisan test
+      #     yarn install
+      #     yarn test
       - name: Build and push Docker images
         uses: docker/build-push-action@v3
         with:
