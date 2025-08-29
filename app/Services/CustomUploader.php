@@ -24,30 +24,22 @@ class CustomUploader
      * Resize and upload an image.
      * Returns the public URL.
      */
-    public function uploadAndResize(UploadedFile $file, string $directory, int $width, int $height): string
+    public function uploadAndResize(UploadedFile $file, string $directory, int $maxWidth, int $maxHeight): string
     {
         $filename = pathinfo($file->hashName(), PATHINFO_FILENAME);
-        $newFilename = "{$filename}-{$width}x{$height}.png";
+        $newFilename = "{$filename}-{$maxWidth}x{$maxHeight}.png";
         $path = $directory.'/'.$newFilename;
         $manager = new ImageManager(new Driver);
 
-        // Read and resize the image, keeping aspect ratio
+        // Resize: maxWidth and maxHeight are upper limits, will not stretch
         $image = $manager->read($file->getRealPath())
-            ->resize($width, $height, function ($constraint) {
+            ->resize($maxWidth, $maxHeight, function ($constraint) {
                 $constraint->aspectRatio();
                 $constraint->upsize();
             });
 
-        // Create a canvas with the target dimensions and white background
-        $canvas = $manager->create($width, $height, '#ffffff');
-        // Calculate position to center the resized image on the canvas
-        $x = intval(($width - $image->width()) / 2);
-        $y = intval(($height - $image->height()) / 2);
-        // Place the resized image onto the canvas
-        $canvas->place($image, $x, $y);
-
-        // Encode the **canvas** (not the resized image) to PNG
-        $finalImage = $canvas->toPng();
+        // Encode result (output is only as big as needed, no canvas)
+        $finalImage = $image->toPng();
 
         // Save or upload the image
         $this->disk->put($path, (string) $finalImage, ['visibility' => 'public']);
