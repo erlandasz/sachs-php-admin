@@ -75,17 +75,13 @@ services:
       retries: 3
 
   nginx:
-    image: nginx:alpine
+    image: ghcr.io/${GITHUB_REPOSITORY:-your-username/sachs-admin}-nginx:latest
     container_name: sachs-admin-nginx
     restart: unless-stopped
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
-      - ./docker/nginx/conf.d:/etc/nginx/conf.d
-      - ./public:/var/www/html/public
-      - ./docker/nginx/ssl:/etc/nginx/ssl
       - nginx_logs:/var/log/nginx
     depends_on:
       - app
