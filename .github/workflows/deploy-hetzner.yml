@@ -39,7 +39,7 @@ jobs:
         host: ${{ secrets.HETZNER_HOST }}
         username: ${{ secrets.HETZNER_USER }}
         port: ${{ secrets.HETZNER_PORT }}
-        key: ${{ secrets.HETZNER_SSH_KEY }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
           cd /home/erlandas/app
           docker compose pull
