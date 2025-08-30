@@ -2,8 +2,8 @@
 
 return [
 
-    'key' => env('AIRTABLE_KEY'),
-    'base' => env('AIRTABLE_BASE'),
+    'key' => env('AIRTABLE_API_KEY'),
+    'base' => env('AIRTABLE_BASE_ID'),
 
     'default' => 'default',
 
