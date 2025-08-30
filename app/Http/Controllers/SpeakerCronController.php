@@ -65,7 +65,7 @@ class SpeakerCronController extends Controller
                 continue;
             }
 
-            $allSpeakers = collect($records)
+            $filteredRecords = collect($records)
                 ->filter(function ($record) use ($event) {
                     $events_attended = $record['fields']['eventAttendingFromPanel'] ?? '';
                     $parts = explode('-', $event->slug);
