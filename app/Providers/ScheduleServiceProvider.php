@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
 
 class ScheduleServiceProvider extends ServiceProvider

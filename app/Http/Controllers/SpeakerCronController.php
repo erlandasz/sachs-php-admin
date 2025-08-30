@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Airtable;
+use App\Jobs\ProcessSpeakerJob;
 use App\Models\Event;
 use App\Models\Person;
 use App\Services\AirtableService;
@@ -88,53 +89,53 @@ class SpeakerCronController extends Controller
                     }
 
                     return $hasRole;
-                })
-                ->values()
-                ->map(function ($record) use ($updated, $created) {
-                    $full_name = $record['fields']['Full Name'] ?? '';
-                    $existing = Person::where('full_name', $full_name)->first();
-
-                    $first_name = $record['fields']['firstname'] ?? null;
-                    $last_name = $record['fields']['lastname'] ?? null;
-                    $company = $record['fields']['Company Name'] ?? null;
-                    $job_title = $record['fields']['jobtitle'] ?? null;
-                    $record_id = $record['fields']['record_id'] ?? null;
-
-                    if (is_array($record_id)) {
-                        // If it's an array with one item, extract that item as string
-                        if (count($record_id) === 1) {
-                            $record_id = $record_id[0];
-                        } else {
-                            // Convert array to string representation if needed, or handle error
-                            $record_id = json_encode($record_id);
-                        }
-                    }
-
-                    if ($existing) {
-                        if (Carbon::parse($existing->updated_at)->lt(Carbon::now()->subDays(2))) {
-                            $this->updatePerson($existing->id, $first_name, $last_name, $full_name, $company, $job_title, $record_id);
-                            $updated++;
-                        }
-                    } else {
-                        $this->createPerson($first_name, $last_name, $full_name, $company, $job_title, $record_id);
-                        $created++;
-                    }
-
                 });
 
-            $results[$event_slug] = [
-                'total' => count($allSpeakers),
-                'created' => $created,
-                'updated' => $updated,
-            ];
+            foreach ($filteredRecords as $record) {
+                \Log::debug('Dispatching job for speaker ...');
+                ProcessSpeakerJob::dispatch($record, $this->airtableService);
+            }
+            // ->values()
+            // ->map(function ($record) use ($updated, $created) {
+            //     $full_name = $record['fields']['Full Name'] ?? '';
+            //     $existing = Person::where('full_name', $full_name)->first();
+
+            //     $first_name = $record['fields']['firstname'] ?? null;
+            //     $last_name = $record['fields']['lastname'] ?? null;
+            //     $company = $record['fields']['Company Name'] ?? null;
+            //     $job_title = $record['fields']['jobtitle'] ?? null;
+            //     $record_id = $record['fields']['record_id'] ?? null;
+
+            //     if (is_array($record_id)) {
+            //         // If it's an array with one item, extract that item as string
+            //         if (count($record_id) === 1) {
+            //             $record_id = $record_id[0];
+            //         } else {
+            //             // Convert array to string representation if needed, or handle error
+            //             $record_id = json_encode($record_id);
+            //         }
+            //     }
+
+            //     if ($existing) {
+            //         if (Carbon::parse($existing->updated_at)->lt(Carbon::now()->subDays(2))) {
+            //             $this->updatePerson($existing->id, $first_name, $last_name, $full_name, $company, $job_title, $record_id);
+            //             $updated++;
+            //         }
+            //     } else {
+            //         $this->createPerson($first_name, $last_name, $full_name, $company, $job_title, $record_id);
+            //         $created++;
+            //     }
+
+            // });
+
+            // $results[$event_slug] = [
+            //     'total' => count($allSpeakers),
+            //     'created' => $created,
+            //     'updated' => $updated,
+            // ];
         }
 
-        return response()->json([
-            'message' => 'Speakers uploaded successfully',
-            'data' => $results,
-            'erorrs' => $failed_events,
-            '',
-        ]);
+        return response()->json();
     }
 
     private function updatePerson($id, $fn, $ln, $fulln, $comp, $jt, $rec_id)
