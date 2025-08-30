@@ -45,6 +45,10 @@ COPY docker/nginx.conf /etc/nginx/nginx.conf
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY docker/php.ini /usr/local/etc/php/conf.d/custom.ini
 
+RUN apk add --no-cache cronie
+COPY docker/schedule-cron /etc/cron.d/schedule-cron
+RUN chmod 0644 /etc/cron.d/schedule-cron && crontab -u www-data /etc/cron.d/schedule-cron
+
 # Create necessary runtime directories and set permissions
 RUN mkdir -p /var/log/nginx /var/log/supervisor /run/nginx && \
     chown -R www-data:www-data /var/www/html

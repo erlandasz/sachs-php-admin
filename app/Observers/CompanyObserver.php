@@ -3,11 +3,19 @@
 namespace App\Observers;
 
 use App\Models\Company;
+use App\Services\AirtableService;
 use App\Services\CustomUploader;
 use Illuminate\Support\Facades\Storage;
 
 class CompanyObserver
 {
+    protected AirtableService $airtableService;
+
+    public function __construct(AirtableService $airtableService)
+    {
+        $this->airtableService = $airtableService;
+    }
+
     public function saving(Company $company): void
     {
         if ($company->isDirty('logo_name')) {
@@ -37,6 +45,10 @@ class CompanyObserver
                 $path = ltrim($parsed['path'], '/');
                 \Illuminate\Support\Facades\Storage::disk('r2')->delete($path);
             }
+        }
+
+        if ($company->isDirty('airtableId') && isset($company->airtableId)) {
+            $this->airtableService->loadCompany($company->id);
         }
     }
 
