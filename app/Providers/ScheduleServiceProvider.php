@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\ServiceProvider;
 
 class ScheduleServiceProvider extends ServiceProvider
@@ -17,8 +18,10 @@ class ScheduleServiceProvider extends ServiceProvider
     /**
      * Bootstrap services.
      */
-    public function boot(): void
+    public function boot(Schedule $schedule): void
     {
-        //
+        $schedule->call(function () {
+            Log::info('doing cron');
+        })->everyMinute();
     }
 }
