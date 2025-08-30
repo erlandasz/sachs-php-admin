@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v3
         with:
           node-version: '20'
@@ -22,26 +24,27 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.CR_PAT }}
-        
+
       - name: Build and push Docker images
         uses: docker/build-push-action@v3
         with:
           push: true
           tags: ghcr.io/${{ github.repository }}:latest
+          no-cache: true
 
   deploy:
     needs: build_and_push
     runs-on: ubuntu-latest
     steps:
-    - name: SSH and Deploy to Hetzner Server
-      uses: appleboy/ssh-action@v0.1.7
-      with:
-        host: ${{ secrets.HETZNER_HOST }}
-        username: ${{ secrets.HETZNER_USER }}
-        port: ${{ secrets.HETZNER_PORT }}
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
-        script: |
-          cd /home/erlandas/app
-          docker compose pull
-          docker compose up -d
-          docker compose exec app php artisan migrate --force
+      - name: SSH and Deploy to Hetzner Server
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.HETZNER_HOST }}
+          username: ${{ secrets.HETZNER_USER }}
+          port: ${{ secrets.HETZNER_PORT }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /home/erlandas/app
+            docker compose pull
+            docker compose up -d --force-recreate
+            docker compose exec app php artisan migrate --force
