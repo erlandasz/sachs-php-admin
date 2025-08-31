@@ -138,6 +138,7 @@ class ProcessPresentersJob implements ShouldQueue
                         $updated++;
                     } else {
                         Log::debug('Company up-to-date, skipping update: '.$company_name);
+                        $this->addPresentationToEvent($existing->id, $role, $event->id);
                     }
                 } else {
                     $this->create_company($company_name, $record_id, $role, $event);
@@ -159,7 +160,7 @@ class ProcessPresentersJob implements ShouldQueue
         if (! is_array($roles)) {
             $roles = [$roles];
         }
-        $required_roles = ['10-min In-Person', '20-min In-Person', '5-min Showcase', '10-min Showcase'];
+        $required_roles = ['10-min In-person', '20-min In-person', '5-min showcase', '10-min showcase'];
 
         foreach ($required_roles as $required_role) {
             if (in_array($required_role, $roles)) {
