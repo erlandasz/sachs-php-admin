@@ -63,30 +63,33 @@ class ProcessPresentersJob implements ShouldQueue
             $filteredRecords = collect($records)
                 ->filter(function ($record) use (&$matchedRoles) {
                     $roles = $record['fields']['Presentation/Showcase'] ?? [];
-                    foreach ($roles as $role) {
-                        $matchedRoles->push($role);
-                    }
+
                     if (! is_array($roles)) {
                         if (isset($roles)) {
                             Log::error('roles not array', [
                                 'roles' => $roles,
                             ]);
                         }
-
                         $roles = [$roles];
                     }
-                    $required_roles = ['10-min In-person', '20-min In-person', '5-min showcase', '10-min showcase'];
 
+                    foreach ($roles as $role) {
+                        $matchedRoles->push($role);
+                        if (stripos($role, 'seed') !== false) {
+                            return true; // Match seed roles
+                        }
+                    }
+
+                    $required_roles = ['10-min In-person', '20-min In-person', '5-min showcase', '10-min showcase'];
                     foreach ($required_roles as $required_role) {
                         foreach ($roles as $role) {
-                            if (stripos(strtolower($role), strtolower($required_role)) !== false) {
+                            if (stripos($role, $required_role) !== false) {
                                 return true;
                             }
                         }
                     }
 
                     return false;
-
                 })
                 ->filter(function ($record) use ($event) {
                     $parts = explode('-', $event->slug);
@@ -208,6 +211,7 @@ class ProcessPresentersJob implements ShouldQueue
         }
 
         $normalizedRole = $this->normalizeRole($role);
+        $mappedRole = $this->mapRoleToDb($normalizedRole);
 
         // Retrieve all presenter types from DB
         $allRoles = PresenterType::all();
@@ -215,7 +219,7 @@ class ProcessPresentersJob implements ShouldQueue
         // Find a matching presenter type by comparing normalized names in PHP
         $existing_role = null;
         foreach ($allRoles as $presenterType) {
-            if ($this->normalizeRole($presenterType->name) === $normalizedRole) {
+            if ($this->normalizeRole($presenterType->name) === $mappedRole) {
                 $existing_role = $presenterType;
                 break;
             }
@@ -256,5 +260,23 @@ class ProcessPresentersJob implements ShouldQueue
         $string = trim($string);
 
         return $string;
+    }
+
+    private function mapRoleToDb(string $normalizedRole): string
+    {
+        // If role contains 'seed' anywhere, map to 'Rising Stars Session'
+        if (strpos($normalizedRole, 'seed') !== false) {
+            return 'rising stars session';
+        }
+
+        $roleMap = [
+            '10 minute in person' => '10-minute in-person',
+            '20 minute in person' => '20-minute in-person',
+            '5 minute showcase' => '5-minute showcase',
+            '10 minute showcase' => '10-minute showcase',
+            // Add other mappings as needed
+        ];
+
+        return $roleMap[$normalizedRole] ?? $normalizedRole;
     }
 }
