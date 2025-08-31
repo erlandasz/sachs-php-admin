@@ -137,8 +137,8 @@ class ProcessPresentersJob implements ShouldQueue
                         $this->update_company($existing, $record_id, $role, $event);
                         $updated++;
                     } else {
-                        Log::debug('Company up-to-date, skipping update: '.$company_name);
-                        $this->addPresentationToEvent($existing->id, $role, $event->id);
+                        Log::debug('Company up-to-date, skipping update: '.$company_name.' role: '.$role);
+                        $this->addPresentationToEvent($existing->id, $role, $event->id, $existing->name);
                     }
                 } else {
                     $this->create_company($company_name, $record_id, $role, $event);
@@ -160,11 +160,17 @@ class ProcessPresentersJob implements ShouldQueue
         if (! is_array($roles)) {
             $roles = [$roles];
         }
-        $required_roles = ['10-min In-person', '20-min In-person', '5-min showcase', '10-min showcase'];
+        $required_roles = ['10-min In-person', '20-min In-person', '5-min showcase', '10-min showcase', '10-Min In-Person', '20-Min In-Person'];
 
-        foreach ($required_roles as $required_role) {
-            if (in_array($required_role, $roles)) {
-                return $required_role;
+        // Normalize required roles once
+        $normalized_required_roles = array_map(function ($role) {
+            return $this->normalizeRole($role);
+        }, $required_roles);
+
+        foreach ($roles as $role) {
+            $normalized_role = $this->normalizeRole($role);
+            if (in_array($normalized_role, $normalized_required_roles, true)) {
+                return $role; // Return original role text as is
             }
         }
 
@@ -180,7 +186,7 @@ class ProcessPresentersJob implements ShouldQueue
             'airtableId' => $record_id,
         ]);
 
-        $this->addPresentationToEvent($company->id, $role, $event->id);
+        $this->addPresentationToEvent($company->id, $role, $event->id, $company->name);
     }
 
     private function update_company(Company $existing_company, $record_id, ?string $role, Event $event): void
@@ -190,13 +196,13 @@ class ProcessPresentersJob implements ShouldQueue
         $existing_company->airtableId = $record_id;
         $existing_company->save();
 
-        $this->addPresentationToEvent($existing_company->id, $role, $event->id);
+        $this->addPresentationToEvent($existing_company->id, $role, $event->id, $existing_company->name);
     }
 
-    private function addPresentationToEvent(int $companyId, ?string $role, int $event_id): void
+    private function addPresentationToEvent(int $companyId, ?string $role, int $event_id, string $name): void
     {
         if (empty($role)) {
-            Log::debug('No role specified, skipping presentation creation for company ID '.$companyId);
+            Log::debug('No role specified, skipping presentation creation for company ID '.$name);
 
             return;
         }
