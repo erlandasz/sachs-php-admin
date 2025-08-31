@@ -1,16 +1,19 @@
 services:
   app:
-    image: ghcr.io/${GITHUB_REPOSITORY:-your-username/sachs-admin}:latest
+    image: ghcr.io/erlandasz/sachs-php-admin:latest
     container_name: sachs-admin-app
     restart: unless-stopped
     environment:
+      - APP_NAME=SachsAdmin
       - APP_ENV=production
       - APP_DEBUG=false
+      - APP_URL=${APP_URL}
       - DB_CONNECTION=mysql
       - DB_HOST=db
       - DB_PORT=3306
       - DB_DATABASE=${DB_DATABASE}
       - DB_USERNAME=${DB_USERNAME}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - DB_PASSWORD=${DB_PASSWORD}
       - REDIS_HOST=redis
       - REDIS_PORT=6379
@@ -35,7 +38,7 @@ services:
     networks:
       - sachs-admin-network
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost/up" ]
+      test: ['CMD', 'curl', '-f', 'http://localhost/up']
       interval: 30s
       timeout: 10s
       retries: 3
@@ -48,14 +51,16 @@ services:
       MYSQL_DATABASE: ${DB_DATABASE}
       MYSQL_USER: ${DB_USERNAME}
       MYSQL_PASSWORD: ${DB_PASSWORD}
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     volumes:
-      - mysql_data:/var/lib/mysql
-      - ./docker/mysql/init:/docker-entrypoint-initdb.d
+      - /home/erlandas/app/mysql_data:/var/lib/mysql
+      - /home/erlandas/app/docker/mysql/init:/docker-entrypoint-initdb.d
+    ports:
+      - '3306:3306'
     networks:
       - sachs-admin-network
     healthcheck:
-      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
       interval: 30s
       timeout: 10s
       retries: 3
@@ -65,44 +70,54 @@ services:
     container_name: sachs-admin-redis
     restart: unless-stopped
     volumes:
-      - redis_data:/data
+      - /home/erlandas/app/redis_data:/data
     networks:
       - sachs-admin-network
     healthcheck:
-      test: [ "CMD", "redis-cli", "ping" ]
+      test: ['CMD', 'redis-cli', 'ping']
       interval: 30s
       timeout: 10s
       retries: 3
 
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - certbot-etc:/etc/letsencrypt
+      - ./nginx/conf.d:/etc/nginx/conf.d
+    depends_on:
+      - app
+
   nginx:
-    image: ghcr.io/${GITHUB_REPOSITORY:-your-username/sachs-admin}-nginx:latest
+    image: nginx:alpine
     container_name: sachs-admin-nginx
     restart: unless-stopped
     ports:
-      - "80:80"
-      - "443:443"
+      - '80:80'
+      - '443:443'
     volumes:
-      - nginx_logs:/var/log/nginx
+      - /home/erlandas/app/nginx/conf.d:/etc/nginx/conf.d
+      - /home/erlandas/app/nginx_logs:/var/log/nginx
+      - app_code:/var/www/html:ro
     depends_on:
       - app
     networks:
       - sachs-admin-network
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost/nginx_status" ]
+      test: ['CMD', 'curl', '-f', 'http://localhost/nginx_status']
       interval: 30s
       timeout: 10s
       retries: 3
 
 volumes:
-  mysql_data:
-    driver: local
-  redis_data:
-    driver: local
   app_storage:
     driver: local
   app_cache:
     driver: local
-  nginx_logs:
+  app_code:
+    driver: local
+  certbot-etc:
+    driver: local
+  certbot-var:
     driver: local
 
 networks:
