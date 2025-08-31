@@ -63,7 +63,6 @@ class ProcessPresentersJob implements ShouldQueue
             $filteredRecords = collect($records)
                 ->filter(function ($record) use (&$matchedRoles) {
                     $roles = $record['fields']['Presentation/Showcase'] ?? [];
-                    Log::warning($roles);
                     foreach ($roles as $role) {
                         $matchedRoles->push($role);
                     }
@@ -76,16 +75,18 @@ class ProcessPresentersJob implements ShouldQueue
 
                         $roles = [$roles];
                     }
-                    $required_roles = ['10-min In-Person', '20-min In-Person', '5-min Showcase', '10-min Showcase'];
+                    $required_roles = ['10-min In-person', '20-min In-person', '5-min showcase', '10-min showcase'];
 
                     foreach ($required_roles as $required_role) {
-                        if (in_array($required_role, $roles)) {
-                            // Record matches required role
-                            return true;
+                        foreach ($roles as $role) {
+                            if (stripos(strtolower($role), strtolower($required_role)) !== false) {
+                                return true;
+                            }
                         }
                     }
 
                     return false;
+
                 })
                 ->filter(function ($record) use ($event) {
                     $parts = explode('-', $event->slug);
