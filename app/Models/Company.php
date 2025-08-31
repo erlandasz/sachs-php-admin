@@ -87,9 +87,25 @@ class Company extends Model
     protected $connection = 'mysql_hostinger';
 
     protected $fillable = [
-        'name', 'phone_no', 'founded', 'website',
-        'profile', 'financial_summary', 'logo_name', 'type',
-        'address', 'email', 'ticker', 'events', 'sector',
+        'name',
+        'phone_no',
+        'founded',
+        'website',
+        'profile',
+        'financial_summary',
+        'logo_name',
+        'type',
+        'address',
+        'email',
+        'ticker',
+        'events',
+        'sector',
+        'airtableId',
+        'city',
+        'state',
+        'zip',
+        'country',
+        'short_profile',
     ];
 
     /**

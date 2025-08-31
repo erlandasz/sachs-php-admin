@@ -48,6 +48,9 @@ class CompanyObserver
         }
 
         if ($company->isDirty('airtableId') && isset($company->airtableId)) {
+
+            $company->saveQuietly();
+
             $this->airtableService->loadCompany($company->id);
         }
     }

@@ -42,7 +42,7 @@ class AirtableService
 
     public function getEntry(string $airtableId)
     {
-        $entry = Airtable::table($this->table)->find($airtableId);
+        $entry = Airtable::table('company-profiles')->find($airtableId);
 
         if (! $entry) {
             throw new Exception('Airtable entry not found', $airtableId);
@@ -101,8 +101,8 @@ class AirtableService
 
         if ($closestSpeaker) {
             $closestSpeaker->airtableId = $recordId;
-            $closestSpeaker->save();
-            $this->loadFromAirtable($closestSpeaker->id);
+            $closestSpeaker->saveQuietly();
+            $this->loadSpeaker($closestSpeaker->id);
             $updated = true;
         } else {
             $closestSpeaker = Person::create([
@@ -114,7 +114,7 @@ class AirtableService
                 'bio' => '-',
                 'title' => 'dr',
             ]);
-            $this->loadFromAirtable($closestSpeaker->id);
+            $this->loadSpeaker($closestSpeaker->id);
             $created = true;
         }
 
@@ -198,8 +198,31 @@ class AirtableService
             $company->cloudinary_url = null;
         }
 
+        $updatedFields = [];
+
         foreach ($this->airtableFieldMap as $property => $fieldName) {
-            $company->$property = ! empty($airtableEntryFields[$fieldName]) ? str_replace("\n\n", "\n", $airtableEntryFields[$fieldName]) : $company->$property;
+            $newValue = $airtableEntryFields[$fieldName] ?? null;
+
+            if (is_array($newValue)) {
+                $newValue = implode(', ', $newValue);
+            }
+
+            if (! empty($newValue)) {
+                $newValue = str_replace("\n\n", "\n", $newValue);
+                $oldValue = $company->$property;
+
+                if ($oldValue !== $newValue) {
+                    $updatedFields[$property] = [
+                        'old' => $oldValue,
+                        'new' => $newValue,
+                    ];
+                    $company->$property = $newValue;
+                }
+            }
+        }
+
+        if (! empty($updatedFields)) {
+            \Log::info("Updated fields for company '{$company->name}':", $updatedFields);
         }
 
         return $company->save();
