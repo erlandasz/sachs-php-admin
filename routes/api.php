@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AttendeeCronController;
+use App\Http\Controllers\PresenterCronController;
 use App\Http\Controllers\SpeakerCronController;
 use App\Services\AirtableService;
 use Illuminate\Http\Request;
@@ -11,8 +12,9 @@ Route::get('/trigger', function (Request $request) {
 });
 
 Route::prefix('cron')->group(function () {
-    Route::get('/event-attendees', [AttendeeCronController::class, 'attendees']);
+    Route::get('/event-attendees', [AttendeeCronController::class, 'index']);
     Route::get('/speakers', [SpeakerCronController::class, 'index']);
+    Route::get('/presenters', [PresenterCronController::class, 'index']);
 });
 
 Route::prefix('webhook')->group(function () {

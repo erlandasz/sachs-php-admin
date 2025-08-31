@@ -35,7 +35,7 @@ class ProcessSpeakerJob implements ShouldQueue
         $company = $this->record['fields']['Company Name'] ?? null;
         $job_title = $this->record['fields']['jobtitle'] ?? null;
         $record_id = $this->record['fields']['record_id'] ?? null;
-        \Log::debug('Processing '.$full_name);
+        logger()->debug('Processing '.$full_name);
         if (is_array($record_id)) {
             if (count($record_id) === 1) {
                 $record_id = $record_id[0];

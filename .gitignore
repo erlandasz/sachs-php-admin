@@ -1,4 +1,5 @@
 /.phpunit.cache
+/stubs
 .DS_Store
 /bootstrap/ssr
 /node_modules
