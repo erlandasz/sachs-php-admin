@@ -207,10 +207,19 @@ class ProcessPresentersJob implements ShouldQueue
             return;
         }
 
-        $existing_role = PresenterType::whereRaw(
-            'LOWER(REPLACE(REPLACE(name, "-", " "), "min", "minute")) = ?',
-            [$this->normalizeRole($role)]
-        )->first();
+        $normalizedRole = $this->normalizeRole($role);
+
+        // Retrieve all presenter types from DB
+        $allRoles = PresenterType::all();
+
+        // Find a matching presenter type by comparing normalized names in PHP
+        $existing_role = null;
+        foreach ($allRoles as $presenterType) {
+            if ($this->normalizeRole($presenterType->name) === $normalizedRole) {
+                $existing_role = $presenterType;
+                break;
+            }
+        }
 
         if (! isset($existing_role)) {
             Log::debug('Role not found in PresenterType: '.$role);
@@ -234,7 +243,6 @@ class ProcessPresentersJob implements ShouldQueue
             'company_id' => $companyId,
             'presenter_type_id' => $existing_role->id,
         ]);
-
         Log::info('Presentation created.', ['presentation_id' => $result->id ?? null]);
     }
 
