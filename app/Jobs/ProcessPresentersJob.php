@@ -234,7 +234,7 @@ class ProcessPresentersJob implements ShouldQueue
     private function normalizeRole(string $string): string
     {
         $string = strtolower($string);
-        $string = str_replace(['min', '-'], 'minute ', $string);
+        $string = str_replace(['min', '-'], ['minute', ' '], $string); // '-' to space ' ', 'min' to 'minute'
         $string = preg_replace('/\s+/', ' ', $string);
         $string = trim($string);
 
