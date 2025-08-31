@@ -63,7 +63,7 @@ class ProcessPresentersJob implements ShouldQueue
             $filteredRecords = collect($records)
                 ->filter(function ($record) use (&$matchedRoles) {
                     $roles = $record['fields']['Presentation/Showcase'] ?? [];
-                    Log::warn($roles);
+                    Log::warning($roles);
                     foreach ($roles as $role) {
                         $matchedRoles->push($role);
                     }
