@@ -209,9 +209,23 @@ class ProcessPresentersJob implements ShouldQueue
 
             return;
         }
+        $mappedRole = null;
 
-        $normalizedRole = $this->normalizeRole($role);
-        $mappedRole = $this->mapRoleToDb($normalizedRole);
+        if (stripos($role, '20-min') !== false) {
+            $mappedRole = '20-minute showcase';
+        }
+
+        if (stripos($role, '10-min') !== false) {
+            $mappedRole = '10-minute showcase';
+        }
+
+        if (stripos($role, 'seed') !== false) {
+            $mappedRole = 'Rising Stars Session';
+        }
+
+        if (! isset($mappedRole)) {
+            Log::debug($role.' not mapped to db value');
+        }
 
         // Retrieve all presenter types from DB
         $allRoles = PresenterType::all();
