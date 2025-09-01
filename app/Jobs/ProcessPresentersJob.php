@@ -226,7 +226,7 @@ class ProcessPresentersJob implements ShouldQueue
         }
 
         if (! isset($existing_role)) {
-            Log::debug('Role not found in PresenterType: '.$role);
+            Log::debug('Role not found in PresenterType: '.$role.'  normalized: '.$mappedRole);
 
             return;
         }
