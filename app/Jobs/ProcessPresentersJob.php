@@ -233,7 +233,7 @@ class ProcessPresentersJob implements ShouldQueue
         // Find a matching presenter type by comparing normalized names in PHP
         $existing_role = null;
         foreach ($allRoles as $presenterType) {
-            if ($this->normalizeRole($presenterType->name) === $mappedRole) {
+            if ($presenterType->name === $mappedRole) {
                 $existing_role = $presenterType;
                 break;
             }
