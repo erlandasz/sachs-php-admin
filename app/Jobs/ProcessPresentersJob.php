@@ -163,6 +163,7 @@ class ProcessPresentersJob implements ShouldQueue
         if (! is_array($roles)) {
             $roles = [$roles];
         }
+
         $required_roles = ['10-min In-person', '20-min In-person', '5-min showcase', '10-min showcase', '10-Min In-Person', '20-Min In-Person'];
 
         // Normalize required roles once

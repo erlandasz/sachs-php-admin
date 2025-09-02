@@ -3,10 +3,10 @@
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', function () {
-    return Inertia::render('welcome');
-})->name('home');
-
+// Route::get('/', function () {
+//     return Inertia::render('welcome');
+// })->name('home');
+Route::redirect('/', '/admin');
 Route::middleware(['web', 'auth'])
     ->get('/private-pdf/badges/{filename}', function ($filename) {
         $path = 'pdf/badges/'.$filename;
